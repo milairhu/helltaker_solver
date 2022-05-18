@@ -1,0 +1,298 @@
+Predicats :
+	murs/2, sortie/2, inc/2 
+
+Fluents :
+	perso/2, block/2, porte/2, piegeActive/2, cle/2, soldat/2
+
+Litteral :
+	aClé/2 : est-ce un fluent? un litteral? une variable dans notre programme plus tard?
+
+
+
+Inc(x,x') : signifie que x'=x+1.
+
+Déplacement simple :
+
+Action(MouvD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ ¬block(x,y') ∧ ¬mur(x,y') ∧ ¬soldat(x,y') ∧ ¬porte(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y))
+
+Action(MouvG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ ¬block(x,y') ∧ ¬mur(x,y') ∧ ¬soldat(x,y') ∧ ¬porte(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y))
+
+Action(MouvH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ ¬block(x',y) ∧ ¬mur(x',y) ∧ ¬soldat(x',y) ∧ ¬porte(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y))
+
+Action(MouvB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ ¬block(x',y) ∧ ¬mur(x',y) ∧ ¬soldat(x',y) ∧ ¬porte(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y))
+
+--------------------------------------------------------------------------------------------------------
+
+Pousser Soldat :
+                                    
+Action(PushSoldatD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y")
+EFFECT : soldat(x,y") ∧ ¬soldat(x,y'))
+
+Action(PushSoldatG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y")
+EFFECT : soldat(x,y") ∧ ¬soldat(x,y'))
+
+Action(PushSoldatH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y)
+EFFECT : soldat(x",y) ∧ ¬soldat(x',y))
+
+Action(PushSoldatB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y)
+EFFECT : soldat(x",y) ∧ ¬soldat(x',y))
+
+--Pareil, mais si piege activé, meurt
+
+Action(PushSoldatSurPiegeActiveD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y")
+EFFECT : ¬soldat(x,y'))
+
+Action(PushSoldatSurPiegeActiveG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y")
+EFFECT :  ¬soldat(x,y'))
+
+Action(PushSoldatSurPiegeActiveH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)
+EFFECT :  ¬soldat(x',y))
+
+Action(PushSoldatSurPiegeActiveB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)
+EFFECT :  ¬soldat(x',y))
+----------------------------------------------------------------------------------------------------------
+
+Pousser Block :
+
+Action(PushBlockD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ ¬soldat(x,y") ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
+EFFECT : block(x,y") ∧ ¬block(x,y'))
+
+Action(PushBlockG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ ¬soldat(x,y")∧ block(x,y') ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
+EFFECT : block(x,y") ∧ ¬block(x,y'))
+
+Action(PushBlockH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ ¬soldat(x',y)∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+Action(PushBlockB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ ¬soldat(x',y)∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+---------------------------------------------------------------------------------------------------------
+
+Casser Soldat (quand contre mur (et block? et soldat? et porte? A TRANCHER : a priori se casse partout sauf sur soldat)):
+
+Action(CasserSoldatContreMurD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ mur(x,y") 
+EFFECT :  ¬soldat(x,y'))
+
+Action(CasseSoldatContreMurG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ mur(x,y") 
+EFFECT : ¬soldat(x,y'))
+
+Action(CasserSoldatContreMurH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y) ∧ mur(x",y) 
+EFFECT : ¬soldat(x',y))
+
+Action(CasserSoldatContreMurB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ mur(x",y) 
+EFFECT : ¬soldat(x',y))
+
+
+--Pareil, mais contre block:
+ 
+Action(CasserSoldatContreBlockD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ block(x,y") 
+EFFECT :  ¬soldat(x,y'))
+
+Action(CasseSoldatContreBlockG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ block(x,y") 
+EFFECT : ¬soldat(x,y'))
+
+Action(CasserSoldatContreBlockH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y) ∧ block(x",y) 
+EFFECT : ¬soldat(x',y))
+
+Action(CasserSoldatContreBlockB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ block(x",y) 
+EFFECT : ¬soldat(x',y))
+
+
+--Pareil mais contre porte :
+
+
+Action(CasserSoldatContrePorteD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ porte(x,y") 
+EFFECT :  ¬soldat(x,y'))
+
+Action(CasseSoldatContrePorteG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ porte(x,y") 
+EFFECT : ¬soldat(x,y'))
+
+Action(CasserSoldatContrePorteH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y) ∧ porte(x",y) 
+EFFECT : ¬soldat(x',y))
+
+Action(CasserSoldatContrePorteB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ porte(x",y) 
+EFFECT : ¬soldat(x',y))
+
+--Pareil mais contre soldat :
+
+
+Action(CasserSoldatContreSoldatD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ soldat(x,y") 
+EFFECT :  ¬soldat(x,y'))
+
+Action(CasseSoldatContreSoldatG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ soldat(x,y") 
+EFFECT : ¬soldat(x,y'))
+
+Action(CasserSoldatContreSoldatH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y) ∧ soldat(x",y) 
+EFFECT : ¬soldat(x',y))
+
+Action(CasserSoldatContreSoldatB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ soldat(x",y) 
+EFFECT : ¬soldat(x',y))
+
+
+--------------------------------------------------------------------------------------------------------------
+
+Obtenir une Clé : Action? ou juste un booléen dans programme?
+
+Action(ObtenirCléD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y))
+
+Action(ObtenirCléG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y))
+
+Action(ObtenirCléH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ clé(x',y)∧ ¬block(x',y) ∧ ¬soldat(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y))
+
+Action(ObtenirCléB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ clé(x',y) ∧ ¬block(x',y) ∧ ¬soldat(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y))
+
+-----------------------------------------------------------------------------------------------------------------
+
+Ouvrir une Porte avec la clé : aClé est littéral qui dit si on a une clé ou pas!
+
+Action(OuvrirPorteD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ aClé ∧ porte(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
+
+Action(OuvrirPorteG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ aClé ∧ porte(x,y')
+EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
+
+Action(OuvrirPorteH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ aClé ∧ porte(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
+
+Action(OuvrirPorteB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ aClé ∧ porte(x',y)
+EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
+
+---------------------------------------------------------------------------------------------------------------
+
+Taper le Block (le block ne bouge pas, le perso non plus, on a juste utilisé un coup pour perdre du temps : si bloc,mur ou soldat derrière)
+
+Action(PushBlockContreBlockD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ block(x,y")
+EFFECT : )
+
+Action(PushBlockContreBlockG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ block(x,y") 
+EFFECT : )
+
+Action(PushBlockContreBlockH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ block(x",y) ∧ block(x',y) 
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+Action(PushBlockContreBlockB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ block(x",y) 
+EFFECT : )
+
+
+--Pareil mais pour Soldat :
+
+Action(PushBlockContreSoldatD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ soldat(x,y")
+EFFECT : )
+
+Action(PushBlockContreSoldatG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ soldat(x,y") 
+EFFECT : )
+
+Action(PushBlockContreSoldatH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x",y) ∧ block(x',y) 
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+Action(PushBlockContreSoldatB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ soldat(x",y) 
+EFFECT : )
+
+
+--Pareil mais pour Mur :
+
+Action(PushBlockContreMurD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ mur(x,y")
+EFFECT : )
+
+Action(PushBlockContreMurG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ mur(x,y") 
+EFFECT : )
+
+Action(PushBlockContreMurH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ mur(x",y) ∧ block(x',y) 
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+Action(PushBlockContreMurB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ mur(x",y) 
+EFFECT : )
+
+--Pareil mais pour Porte :
+
+Action(PushBlockContrePorteD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ porte(x,y")
+EFFECT : )
+
+Action(PushBlockContrePorteG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ block(x,y') ∧ porte(x,y") 
+EFFECT : )
+
+Action(PushBlockContrePorteH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ porte(x",y) ∧ block(x',y) 
+EFFECT : block(x",y) ∧ ¬block(x',y))
+
+Action(PushBlockContrePorteB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ porte(x",y) 
+EFFECT : )
+
+
+-----------------------------------------------------------------------------------------------
+
+DIFFERENCES AVEC SOKOBAN :
+
+Sokoban ne permet que de pousser les caisses et de deplacer le personnage. Ici :
+
+- Pousser une "caisse" coute une action à part entière. Le bonhomme n'avance pas.
+- On peut casser un certain type de caisse, les "soldats", en les poussant contre des objets fixes.
+- Certaines cases sont parfois piégées, parfois non. Cela se fait indépendamment de la décision du joueur!
+- Un bloc peut être sur un piège
+- Il y a une notion de clé, qui permet qu'un "mur" n'en soit plus un.
+
+SURTOUT :
+- Le but n'est pas de disposer les caisses à un endroit précis, mais bien de mettre le personnage sur une case adjacente à la sortie (ou mettre 3 ou 4 sorties). 
