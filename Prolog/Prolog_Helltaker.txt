@@ -1,0 +1,309 @@
+
+%mur(...).
+%mur(...).
+%piegeFixe(...).
+
+%case(...).
+%case(...).
+
+%% dans state, NbCles indique le nombre de clé possédé.
+%%	   On suppose qu'il peut y avoir plusieurs clés et plusieurs portes. (Pas dans le jeu de base).
+
+%%%% Utilitaires : %%%%
+
+retire_element([X|R], X, R).
+retire_element([H|R1], X, [H|R2]) :- retire_element(R1, X, R2), X \= H.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù
+
+succ(left, pos(X,Y0), pos(X,Y1)):-
+        Y1 is Y0 -1,
+        case(X,Y0),
+        case(X,Y1).
+        
+succ(right,pos(X,Y0), pos(X,Y1)):-
+        Y1 is Y0+1,
+        case(X,Y0),
+        case(X,Y1).
+
+succ(up, pos(X0,Y), pos(X1,Y)):-
+        X1 is X0 -1,
+        case(X0,Y),
+        case(X1,Y).
+        
+succ(down, pos(X0,Y), pos(X1,Y)):-
+        X1 is X0 +1,
+        case(X0,Y),
+        case(X1,Y).     
+
+notin(_, []).
+notin(X, [Y|T]) :- dif(X,Y), notin(X,T).
+
+%%%deplacer perso sans perdre de piege:
+
+do(	action(move,Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X1,Y1), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles, Chrono2)) :-
+	
+	succ(Dir,pos(X,Y),pos(X1,Y1)),
+        notin(pos(X1,Y1), LB),
+	notin(pos(X1,Y1), LS),
+	\+mur(pos(X1,Y1)),
+         notin(pos(X1,Y1), LC),
+	 notin(pos(X1,Y1), LP),
+
+	Chrono2 is Chrono-1.
+
+%%%deplacer perso en se prennant un piege:
+
+do(	action(moveAvecDegat,Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X1,Y1), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles, Chrono2)) :-
+	
+	succ(Dir,pos(X,Y),pos(X1,Y1)),
+        notin(pos(X1,Y1), LB),
+	notin(pos(X1,Y1), LS),
+	\+mur(pos(X1,Y1)),
+         notin(pos(X1,Y1), LC),
+	 notin(pos(X1,Y1), LP),
+
+	(piegeFixe(pos(X1,Y1); member(pos(X1,Y1),LPNA)), %LPNA car au moment de se déplacer, il perd de la vie si avant, le piege etait desactivé
+
+	Chrono2 is Chrono-2.
+
+
+%%Pousser soldat sur nouvelle case
+do(	action(pushSoldat, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS1), clés(LC), NbCles),Chrono,
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats([pos(X2,Y2)|LS2]), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LS1),
+	\+mur(pos(X2,Y2)),
+	notin(pos(X2,Y2),LB),
+	notin(pos(X2,Y2),LS1),
+	notin(pos(X2,Y2),LPA),
+	notin(pos(X2,Y2), LP),
+
+	retire_element(LS1,pos(X1,Y1),LS2),
+	Chrono2 is Chrono-1.
+
+do(	action(pushSoldatAvecDegat, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS1), clés(LC), NbCles),Chrono,
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats([pos(X2,Y2)|LS2]), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LS1),
+	\+mur(pos(X2,Y2)),
+	notin(pos(X2,Y2),LB),
+	notin(pos(X2,Y2),LS1),
+	notin(pos(X2,Y2),LPA),
+	notin(pos(X2,Y2), LP),
+
+	(piegeFixe(pos(X,Y); member(pos(X,Y),LPNA)),
+	retire_element(LS1,pos(X1,Y1),LS2),
+	Chrono2 is Chrono-2.
+
+
+%% Pousse le block sur nouvelle case
+do(	action(pushBlock, Dir),
+	state(me(X,Y), blocks(LB1), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks([pos(X2,Y2)|LB2]), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LB1),
+	\+mur(pos(X2,Y2)),
+	notin(pos(X2,Y2),LB1),
+	notin(pos(X2,Y2),LS),
+	
+	notin(pos(X2,Y2), LP),
+
+	retire_element(LB1,pos(X1,Y1),LB2),
+	Chrono2 is Chrono-1.
+
+do(	action(pushBlockAvecDegat, Dir),
+	state(me(X,Y), blocks(LB1), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks([pos(X2,Y2)|LB2]), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LB1),
+	\+mur(pos(X2,Y2)),
+	notin(pos(X2,Y2),LB1),
+	notin(pos(X2,Y2),LS),
+	
+	notin(pos(X2,Y2), LP),
+
+	retire_element(LB1,pos(X1,Y1),LB2),
+	(piegeFixe(pos(X,Y); member(pos(X,Y),LPNA)),
+	Chrono2 is Chrono-2.
+
+
+
+%% Casse soldat sur un block, un mur, un soldat, une porte, un piege : il disparait!
+
+
+do(	action(casseSoldat, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS1), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS2), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LS1),
+	
+	(member(pos(X2,Y2),LPNA); piegeFixe(pos(X2,Y2));\+mur(pos(X2,Y2)); member(pos(X2,Y2),LS1); member(pos(X2,Y2),LB); member(pos(X2,Y2), LP)),
+
+	
+	retire_element(LS1,pos(X1,Y1),LS2),
+	Chrono2 is Chrono-1.
+
+do(	action(casseSoldatAvecDegat, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS1), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS2), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LS1),
+	
+	(member(pos(X2,Y2),LPA); piegeFixe(pos(X2,Y2));\+mur(pos(X2,Y2)); member(pos(X2,Y2),LS1); member(pos(X2,Y2),LB); member(pos(X2,Y2), LP)),
+
+	
+	retire_element(LS1,pos(X1,Y1),LS2),
+	(piegeFixe(pos(X,Y));member(pos(X,Y),LPNA)),
+	Chrono2 is Chrono-2.
+
+
+
+%% Obtenir une clé, se déplace, clé disparait
+do(	action(obtenirCle, Dir),
+	state(me(X,Y), blocks(LB), porte(XP,YP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X1,Y1), blocks(LB), porte(XP,YP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC2), NbCles2,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	
+
+	\+mur(pos(X1,Y1)),
+	notin(pos(X1,Y1),LB1),
+	notin(pos(X1,Y1),LS),
+	notin(pos(X1,Y1),LP),
+
+	NbCles2 is NbCles+1,
+	
+	retire_element(LC,pos(X1,Y1),LC2),
+	Chrono2 is Chrono-1.
+
+
+do(	action(obtenirCleAvecDegat, Dir),
+	state(me(X,Y), blocks(LB), porte(XP,YP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X1,Y1), blocks(LB), porte(XP,YP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC2), NbCles2,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	
+
+	\+mur(pos(X1,Y1)),
+	notin(pos(X1,Y1),LB1),
+	notin(pos(X1,Y1),LS),
+	notin(pos(X1,Y1),LP),
+
+	NbCles2 is NbCles+1,
+	
+	retire_element(LC,pos(X1,Y1),LC2),
+	(piegeFixe(pos(X1,Y1));member(pos(X1,Y1),LPNA)),
+	Chrono2 is Chrono-2.
+
+
+
+%% Ouvrir une porte, perd une clé, se déplace.
+
+do(	action(ouvrirPorte,Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X1,Y1), blocks(LB), portes(LP2), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles2,Chrono2)) :-
+	
+	
+	succ(Dir,pos(X,Y),pos(X1,Y1)),
+        member(pos(X1,Y1),LP),
+	Nbcles >0,
+	Nbcles2 is Nbcles-1,
+	retire_element(LP,pos(X1,Y1),LP2),
+	Chrono2 is Chrono-1.
+
+%% Je pense pas qu'il y ait des portes avec un piege.
+
+%% Taper Block, ne fait rien, juste perd du temps.
+
+do(	action(tapeBlock, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LB),
+
+	( mur(pos(X2,Y2)); member(pos(X2,Y2),LS); member(pos(X2,Y2),LB); member(pos(X2,Y2), LP)),
+	
+
+	Chrono2 is Chrono-1.
+
+
+
+do(	action(tapeBlockAvecDegat, Dir),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPA), piegesNonActifs(LPNA), soldats(LS), clés(LC), NbCles,Chrono),
+	state(me(X,Y), blocks(LB), portes(LP), piegesActifs(LPNA), piegesNonActifs(LPA), soldats(LS), clés(LC), NbCles,Chrono2)) :-
+
+
+	succ(Dir, pos(X,Y), pos(X1,Y1)),
+	succ(Dir, pos(X1,Y1), pos(X2,Y2)),
+	member(pos(X1,Y1),LB),
+
+	( mur(pos(X2,Y2)); member(pos(X2,Y2),LS); member(pos(X2,Y2),LB); member(pos(X2,Y2), LP)),
+	
+
+	(piegeFixe(pos(X,Y));member(pos(X,Y),LPNA)),
+	Chrono2 is Chrono-2.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de toutes les actions %%%%%%%%%%%%%%%%%%%%%%%
+
+%% Remarque :  on aurait peut etre du laisser le main gérer les dégats, pour économiser du code.
+
+%La suite est juste un copié collé de mon TD, a verifier quand on implémentera vraiment un labyrinthe.
+%Comment faire aparaitre le chrono?
+
+initial(state(me(4,2),...)).
+final(state(me(1,1),...)). %autant d'etat final que de case adjacente au demon.
+final(state(me(1,5),...)).
+
+planValide([],[_],0).
+planValide([A|AT],[S1, S2|ST],N) :-
+    N >0,
+    N1 is N-1,
+    do(A,S1, S2),
+    planValide(AT, [S2|ST],N1).
+
+endsup([X],X).
+endsup([_|R],X):-
+   
+    endsup(R,X),!.
+
+planGagnant(Actions, Etats, N) :-
+    Etats = [X|_],
+    initial(X),
+    planValide(Actions, Etats, N),
+    endsup(Etats, Y),
+    final(Y).
+   
+
+
