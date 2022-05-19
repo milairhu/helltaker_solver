@@ -1,0 +1,81 @@
+from collections import namedtuple
+
+State = namedtuple('state',('perso','soldat','piegeActive','porte','block','cle','chrono'))
+Action = namedtuple('action',('verb','direction'))
+
+actions = {d : Action('move',d) for d in 'udrl'} | {d.upper() : Action('move',d) for d in 'udrl'}
+
+
+#### on doit automatiser cette partie plus tard ######
+
+s0 = {'perso': (2, 2),'soldat': {(4, 4), (3, 4), (6, 5), (6, 1), (6, 4), (2, 3), (6, 3)},
+      'piegeActive':{(1,1),(2,1)},'porte':(5,5),'block':{(1,2),(2,1)},'cle':(7,4),'chrono':(35)}  #fluents
+
+#constantes
+map_rules = {'sortie': {(7, 4), (2, 1)},'murs': {(4, 0),(5, 7),(8, 0)},'actions': actions} # actions est l'équivalent de inc/successeurs
+
+#fonctions_intermédiaires
+
+def one_step(position, direction) : 
+    i, j = position
+    return {'r' : (i,j+1), 'l' : (i,j-1), 'u' : (i-1,j), 'd' : (i+1,j)}[direction]
+def freeMurs(position, map_rules) :
+    return not(position in map_rules['murs']) 
+def freeSoldat(position, map_rules) :
+    return not(position in map_rules['soldat'])
+def freePorte(position, map_rules) :
+    return not(position in map_rules['Porte'])
+def freeBlock(position, map_rules) :
+    return not(position in map_rules['block'])
+def freePiege(position, map_rules) :
+    return not(position in map_rules['piegeActive'])
+def freeCle(position, map_rules) :
+    return not(position in map_rules['cle'])
+
+def free_factory(map_rules) : #TBA
+    def free(position) :
+        return not(position in map_rules['murs'])
+    return free
+
+
+def do_fn(action, state) :
+    X0 = state['perso']
+    soldat = state['soldat']
+    porte=state['porte']
+    block=state['block']
+    cle=state['cle']
+    piegeActive=state['piegeActive']
+    chrono=state['chrono']
+    if(chrono<=0): return None # à voir comment gérer ca (ps inférieur car c'est possible de faire une action de -2 avec un chrono égal à 1)
+    X1 = one_step(X0, action.direction)
+    if action.verb == 'déplacement_simple' :
+        if freeMurs(X1,map_rules) and freeBlock(X1,map_rules) and freeSoldat(X1,map_rules) and freePorte(X1,map_rules) :
+            return {'perso' : X1, 'soldat' : soldat,'block':block,'porte':porte,'piegeActive': piegeActive,'cle':cle,'chrono':chrono-1}
+        else :
+            return None
+    if action.verb == 'pousser_soldat_piègeOff' :
+        X2 = one_step(X1, action.direction)
+        if  not(freeSoldat(X1,map_rules)) and freePiege(X2,map_rules) and freeMurs(X2,map_rules) and freeSoldat(X2,map_rules) and freePorte(X2,map_rules) and freeBlock(X2,map_rules):
+            return {'perso' : X0, 'soldat' : {X2}|soldat-{X1},'block':block,'porte':porte,'piegeActive': piegeActive,'cle':cle,'chrono':chrono-1}
+        else :
+            return None
+    if action.verb =='pousser_soldat_piègeONN' :
+        X2 = one_step(X1, action.direction)
+        if  not(freeSoldat(X1,map_rules)) and not(freePiege(X2,map_rules)) and freeMurs(X2,map_rules) and freeSoldat(X2,map_rules) and freePorte(X2,map_rules) and freeBlock(X2,map_rules):
+            return {'perso' : X0, 'soldat' :soldat-{X1},'block':block,'porte':porte,'piegeActive': piegeActive,'cle':cle,'chrono':chrono-1}
+        else :
+            return None
+    return None
+
+"""
+    -problème des pièges qui s'active / désactive, je propose avoir Deux listes(liste des piège actifs, non actifs) 
+    et apres chaque action on échange les lists.(NOT a good idea,du bricolage pour économiser les calculs ?)
+
+    -problème de l'obtention du clé: un bool global cle_obtenue=false, qui sera activé apres l'action de 'Obtenir une Clé', ce bool est utile pour 
+    l'heuristique dans la phase de recherche,mais dans ce cas il faut ajouter freeCle(X1,map_rules) dans l'action 'mouvement_simple' et on perd 
+    la possibilité d'avoir plusieurs clés, ce dernier problème peut s'éviter avec une liste de booléan pour plusieurs clés et vérifier listBool.size() avec le nombre des clé.
+    
+    - Nouveau problème (Carte 5) pousser le soldat dans une case piègeOFF et effectuer une action dans un autre sens par exemple, la piège s'active 
+    puis le soldat meurt, alors apres chaque mouvement faut vérifier State['soldat] avec State['piegeActive']
+"""
+
