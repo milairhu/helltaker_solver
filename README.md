@@ -3,12 +3,6 @@
 ## Description
 L’objectif de ce projet est de créer différentes « IA » capables de jouer à la partie puzzle du jeu Helltaker. Ce jeu, de la famille de Sokoban, est gratuit et disponible sous MacOS, Linux et Windows. L’objectif est d’implémenter différentes méthodes, de les décrire et de les comparer expérimentalement dans un petit rapport final.
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
 ## Travail demandé
 
 ### Écriture du problème en STRIPS et en Prolog
