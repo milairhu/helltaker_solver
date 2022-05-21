@@ -1,4 +1,4 @@
-# IA02 Projet Helltaker
+# IA02 Projet Helltaker : https://hackmd.io/@ia02/BJ6eDYUI5
 
 ## Description
 L’objectif de ce projet est de créer différentes « IA » capables de jouer à la partie puzzle du jeu Helltaker. Ce jeu, de la famille de Sokoban, est gratuit et disponible sous MacOS, Linux et Windows. L’objectif est d’implémenter différentes méthodes, de les décrire et de les comparer expérimentalement dans un petit rapport final.
@@ -58,6 +58,10 @@ Les points suivants seront pris en compte pour l’évaluation :
 - Efficacité du code (les programmes seront lancés automatiquement sur une machine dédiée)
 
 ## Ressources 
+### Nos liens utiles
+
+Path finding avec A* : https://qiao.github.io/PathFinding.js/visual/?fbclid=IwAR3vkBO_nDFXb86Goq_GLt2m1WqAEZwjeUCo3qioAqWGhqhaQ7ASPBZjlHk
+où best first seach = glouton et breadth-first-seach = recherche par largeur
 
 ### Quelques liens
 
