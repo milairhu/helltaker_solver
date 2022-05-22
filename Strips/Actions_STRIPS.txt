@@ -2,16 +2,16 @@ Predicats :
 	murs/2, sortie/2, inc/2 
 
 Fluents :
-	perso/2, block/2, porte/2, piegeActive/2, cle/2, soldat/2
+	perso/2, block/2, porte/2, cle/2, soldat/2, piegeActive/2, piegeInactive/2, piegeFixe/2
 
 Litteral :
 	aClé/2 : est-ce un fluent? un litteral? une variable dans notre programme plus tard?
 
 
-
 Inc(x,x') : signifie que x'=x+1.
 
-Pour ce STRIPS, on ne fait pas figurer de compte à rebours, car ce n'est pas l'objectif du STRIPS
+Pour ce STRIPS, on ne fait pas figurer de compte à rebours, car ce n'est pas l'objectif du STRIPS.
+De plus, nous ne représentons pas les points d'action.
 
 -----------------------------------------------------------------------------------------------------
 
@@ -35,59 +35,98 @@ EFFECT : perso(x',y)∧ ¬perso(x,y))
 
 --------------------------------------------------------------------------------------------------------
 
-Pousser Soldat :
+Pousser Soldat vers une case vide :
                                     
 Action(PushSoldatD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y")
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
 EFFECT : soldat(x,y") ∧ ¬soldat(x,y'))
 
 Action(PushSoldatG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y")
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
 EFFECT : soldat(x,y") ∧ ¬soldat(x,y'))
 
 Action(PushSoldatH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y)
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ ¬piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
 EFFECT : soldat(x",y) ∧ ¬soldat(x',y))
 
 Action(PushSoldatB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y)
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y ) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ ¬piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
 EFFECT : soldat(x",y) ∧ ¬soldat(x',y))
+
+--Pareil, mais si piège fixe, meurt
+
+Action(PushSoldatSurPiegeFixeD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ piegeFixe(x,y")
+EFFECT : ¬soldat(x,y'))
+
+Action(PushSoldatSurPiegeFixeG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ piegeFixe(x,y")
+EFFECT :  ¬soldat(x,y'))
+
+Action(PushSoldatSurPiegeFixeH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ ¬piegeInactive(x",y) ∧ piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y))
+
+Action(PushSoldatSurPiegeFixeB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ ¬piegeInactive(x",y) ∧ piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y))
 
 --Pareil, mais si piege activé, meurt
 
 Action(PushSoldatSurPiegeActiveD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y")
-EFFECT : ¬soldat(x,y'))
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
+EFFECT : ¬soldat(x,y') ∧ piegeActive(x,y") ∧ ¬piegeInactive(x,y"))
 
 Action(PushSoldatSurPiegeActiveG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y')∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y")
-EFFECT :  ¬soldat(x,y'))
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ ¬piegeActive(x,y") ∧ piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
+EFFECT :  ¬soldat(x,y') ∧ piegeActive(x,y") ∧ ¬piegeInactive(x,y"))
 
 Action(PushSoldatSurPiegeActiveH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)
-EFFECT :  ¬soldat(x',y))
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y) ∧ piegeActive(x",y) ∧ ¬piegeInactive(x",y))
 
 Action(PushSoldatSurPiegeActiveB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y)∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)
-EFFECT :  ¬soldat(x',y))
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ ¬piegeActive(x",y) ∧ piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y) ∧ piegeActive(x",y) ∧ ¬piegeInactive(x",y))
+
+--Pareil, mais si piege désactivé, meurt pas 
+
+Action(PushSoldatSurPiegeInactiveD(x,y),
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
+EFFECT : ¬soldat(x,y') ∧ soldat(x,y") ∧ ¬piegeActive(x,y") ∧ piegeInactive(x,y"))
+
+Action(PushSoldatSurPiegeInactiveG(x,y),
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ soldat(x,y') ∧ ¬block(x,y") ∧ ¬mur(x,y") ∧ ¬soldat(x,y") ∧ ¬porte(x,y") ∧ piegeActive(x,y") ∧ ¬piegeInactive(x,y") ∧ ¬piegeFixe(x,y")
+EFFECT :  ¬soldat(x,y') ∧ soldat(x,y") ∧ ¬piegeActive(x,y") ∧ piegeInactive(x,y"))
+
+Action(PushSoldatSurPiegeInactiveH(x,y),
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ soldat(x',y ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y) ∧ ¬piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y) ∧ soldat(x",y) ∧ piegeActive(x",y) ∧ ¬piegeInactive(x",y))
+
+Action(PushSoldatSurPiegeInactiveB(x,y),
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)) ∧ ¬piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
+EFFECT :  ¬soldat(x',y) ∧ soldat(x",y) ∧ ¬piegeActive(x",y) ∧ piegeInactive(x",y))
+
+% comment faire pour que si le monstre va sur un piege desactivé, il meurt au cas d'apres et pas à cette action. Il faut créer une nouvelle action ? %
+
 ----------------------------------------------------------------------------------------------------------
 
 Pousser Block :
 
 Action(PushBlockD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y')∧ ¬soldat(x,y") ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ inc(y',y") ∧ block(x,y') ∧ ¬soldat(x,y") ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
 EFFECT : block(x,y") ∧ ¬block(x,y'))
 
 Action(PushBlockG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ ¬soldat(x,y")∧ block(x,y') ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ inc(y",y') ∧ ¬soldat(x,y") ∧ block(x,y') ∧ ¬mur(x,y") ∧ ¬block(x,y") ∧ ¬porte(x,y")
 EFFECT : block(x,y") ∧ ¬block(x,y'))
 
 Action(PushBlockH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ ¬soldat(x',y)∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ inc(x",x') ∧ ¬soldat(x',y) ∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
 Action(PushBlockB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ ¬soldat(x',y)∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ ¬soldat(x',y) ∧ block(x',y) ∧ ¬mur(x",y) ∧ ¬block(x",y) ∧ ¬porte(x",y)
 EFFECT : block(x",y) ∧ ¬block(x',y))
 
 ---------------------------------------------------------------------------------------------------------
