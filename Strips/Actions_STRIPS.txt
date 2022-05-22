@@ -174,19 +174,19 @@ EFFECT : ¬soldat(x',y))
 Obtenir une Clé : Action? ou juste un booléen dans programme?
 
 Action(ObtenirCléD(x,y),
-PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y')
+PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y') ∧ ¬aClé
 EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléG(x,y),
-PRECOND: perso(x,y) ∧ inc(y',y) ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y')
+PRECOND: perso(x,y) ∧ inc(y',y) ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y') ∧ ¬aClé
 EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléH(x,y),
-PRECOND: perso(x,y) ∧ inc(x',x) ∧ clé(x',y)∧ ¬block(x',y) ∧ ¬soldat(x',y)
+PRECOND: perso(x,y) ∧ inc(x',x) ∧ clé(x',y)∧ ¬block(x',y) ∧ ¬soldat(x',y) ∧ ¬aClé
 EFFECT : perso(x',y)∧ ¬perso(x,y) ∧¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléB(x,y),
-PRECOND: perso(x,y) ∧ inc(x,x') ∧ clé(x',y) ∧ ¬block(x',y) ∧ ¬soldat(x',y)
+PRECOND: perso(x,y) ∧ inc(x,x') ∧ clé(x',y) ∧ ¬block(x',y) ∧ ¬soldat(x',y) ∧ ¬aClé
 EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 -----------------------------------------------------------------------------------------------------------------
