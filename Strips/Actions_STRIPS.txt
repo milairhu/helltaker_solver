@@ -11,9 +11,7 @@ Litteral :
 
 Inc(x,x') : signifie que x'=x+1.
 
-Pour ce STRIPS, on a imaginé qu'on ne peut avoir qu'une unique clé. 
-Le code Prolog associé va plus loin, en considérant qu'il peut y avoir plusieurs clés.
-Aussi, on ne fait pas figurer de compte à rebours ici, car ce n'est pas l'objectif du STRIPS
+Pour ce STRIPS, nous ne faisons pas figurer de compte à rebours ici, car ce n'est pas l'objectif du STRIPS
 
 -----------------------------------------------------------------------------------------------------
 
