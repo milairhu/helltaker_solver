@@ -13,6 +13,8 @@ Inc(x,x') : signifie que x'=x+1.
 Pour ce STRIPS, on ne fait pas figurer de compte à rebours, car ce n'est pas l'objectif du STRIPS.
 De plus, nous ne représentons pas les points d'action.
 
+De plus, le cas où un soldat se trouve sur un piege désactivé et meurt au prochain mouvement du joueur car le piège se réactive n'est pas représenté dans ce STRIPS et ce cas sera géré ultérieurement.
+
 -----------------------------------------------------------------------------------------------------
 
 Déplacement simple :
@@ -106,8 +108,6 @@ EFFECT :  ¬soldat(x',y) ∧ soldat(x",y) ∧ piegeActive(x",y) ∧ ¬piegeInact
 Action(PushSoldatSurPiegeInactiveB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧ soldat(x',y) ∧ ¬block(x",y) ∧ ¬mur(x",y) ∧ ¬soldat(x",y) ∧ ¬porte(x",y) ∧ piegeActive(x",y)) ∧ ¬piegeInactive(x",y) ∧ ¬piegeFixe(x",y)
 EFFECT :  ¬soldat(x',y) ∧ soldat(x",y) ∧ ¬piegeActive(x",y) ∧ piegeInactive(x",y))
-
-% comment faire pour que si le monstre va sur un piege desactivé, il meurt au cas d'apres et pas à cette action. Il faut créer une nouvelle action ? %
 
 ----------------------------------------------------------------------------------------------------------
 
