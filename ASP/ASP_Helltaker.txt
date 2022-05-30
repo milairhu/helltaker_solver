@@ -1,0 +1,98 @@
+#const nbMax=6.
+#const nbLigne=1.
+#const nbCol=7.
+
+netat(0..nbMax).
+col(0..nbCol-1).
+ligne(0..nbLigne-1).
+
+%case((0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6)).
+case(X,Y) :- col(Y), ligne(X).
+
+sorties((0,0),(0,6)).
+
+etatCaisse((0,1),nbMax).
+etatCaisse((0,3),nbMax).
+
+posPerso((0,2),nbMax).
+
+mouv(haut;bas;gauche;droite;pousserDroite;pousserGauche;pousserHaut;pousserBas).
+
+%Genere
+
+%{etatCaisse(Case,NumEtat) : case(Case), netat(NumEtat)}=1.
+
+
+{do(Action,Nb) : mouv(Action)}=1 :- netat(Nb).
+
+
+
+%Contraintes <=> preconditions
+  
+
+%:- do(gauche,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(gauche,Nb),posPerso((X,Y),Nb), etatCaisse((X,Y-1),Nb).
+:- do(gauche,Nb), posPerso((X,Y),Nb),not case(X,Y-1).
+
+%:- do(pousserGauche,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(pousserGauche,Nb),posPerso((X,Y),Nb), not etatCaisse(X,Y-1) .
+:- do(pousserGauche,Nb),posPerso((X,Y),Nb), not case(X,Y-2) .
+:- do(pousserGauche,Nb),posPerso((X,Y),Nb), etatCaisse((X,Y-2),Nb) .
+
+%:- do(droite,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(droite,Nb),posPerso((X,Y),Nb), etatCaisse((X,Y+1),Nb).
+:- do(droite,Nb),posPerso((X,Y),Nb), not case(X,Y+1).
+
+%:- do(pousserDroite,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(pousserDroite,Nb),posPerso((X,Y),Nb), not etatCaisse(X,Y+1) .
+:- do(pousserDroite,Nb), posPerso((X,Y),Nb),not case(X,Y+2) .
+:- do(pousserDroite,Nb),posPerso((X,Y),Nb), etatCaisse((X,Y+2),Nb) .
+
+
+%:- do(haut,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(haut,Nb),posPerso((X,Y),Nb), etatCaisse((X-1,Y),Nb).
+:- do(haut,Nb),posPerso((X,Y),Nb),posPerso((X,Y),Nb), not case(X-1,Y).
+
+%:- do(pousserHaut,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(pousserHaut,Nb),posPerso((X,Y),Nb), not etatCaisse(X-1,Y) .
+:- do(pousserHaut,Nb),posPerso((X,Y),Nb), not case(X-2,Y) .
+:- do(pousserHaut,Nb),posPerso((X,Y),Nb), etatCaisse((X-2,Y),Nb) .
+
+%:- do(bas,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(bas,Nb),posPerso((X,Y),Nb), etatCaisse((X+1,Y),Nb).
+:- do(bas,Nb),posPerso((X,Y),Nb), not case(X+1,Y).
+
+%:- do(pousserBas,Nb),posPerso((X,Y),Nb), not posPerso((X,Y),Nb).
+:- do(pousserBas,Nb),posPerso((X,Y),Nb), not etatCaisse(X+1,Y) .
+:- do(pousserBas,Nb),posPerso((X,Y),Nb), not case(X+2,Y) .
+:- do(pousserBas,Nb),posPerso((X,Y),Nb), etatCaisse((X+2,Y),Nb) .
+
+
+%Effets <=> post-conditions
+
+
+posPerso((X,Y-1),Nb-1) :- posPerso((X,Y),Nb),do(gauche,Nb).
+posPerso((X,Y+1),Nb-1) :-posPerso((X,Y),Nb), do(droite,Nb).
+
+posPerso((X,Y-1),Nb-1) :- posPerso((X,Y),Nb),do(pousserGauche,Nb).
+etatCaisse((X,Y-2),Nb-1) :- posPerso((X,Y),Nb),do(pousserGauche,Nb).
+-etatCaisse((X,Y-1),Nb-1) :- posPerso((X,Y),Nb),do(pousserGauche,Nb).
+
+posPerso((X,Y+1),Nb-1) :- posPerso((X,Y),Nb),do(pousserDroite,Nb).
+etatCaisse((X,Y+2),Nb-1) :- posPerso((X,Y),Nb),do(pousserDroite,Nb).
+-etatCaisse((X,Y+1),Nb-1) :-posPerso((X,Y),Nb), do(pousserDroite,Nb).
+
+posPerso((X-1,Y),Nb-1) :- posPerso((X,Y),Nb),do(haut,Nb).
+posPerso((X+1,Y),Nb-1) :- posPerso((X,Y),Nb),do(bas,Nb).
+
+posPerso((X-1,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserHaut,Nb).
+etatCaisse((X-2,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserHaut,Nb).
+-etatCaisse((X-1,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserHaut,Nb).
+
+posPerso((X+1,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserBas,Nb).
+etatCaisse((X+2,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserBas,Nb).
+etatCaisse((X+1,Y),Nb-1) :- posPerso((X,Y),Nb),do(pousserBas,Nb).
+
+#show do/2.
+
+
