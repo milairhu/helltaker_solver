@@ -1,23 +1,26 @@
 from collections import namedtuple
 Action = namedtuple('action',('verb','direction'))
-actions = {d : frozenset({Action("move",d),Action("push",d)}) for d in 'udrl'}  # on doit ajouter ici tout type des mouvement valide possible.
-State = namedtuple('State',('me','boxes'))   #chaque état doit contenir tous les fluents 
 
-s0 = State(me= (2, 2),boxes= frozenset({(4, 4), (3, 4), (6, 5), (6, 1), (6, 4), (2, 3), (6, 3)}))
-Predicat=namedtuple('Predicat',('goals','walls','actions')) #doit contenir tout les constantes
-map_rules = Predicat(goals= frozenset({(7, 4), (2, 1), (6, 6), (5, 4), (6, 3), (4, 1), (3, 5)}), 
-walls= frozenset({(4, 0), (4, 3), (3, 1), (4, 6), (5, 7), (8, 0),
-(0, 2), (8, 3), (0, 5), (8, 6), (1, 0), (1, 6), (7, 7), (4, 2),
-(3, 0), (5, 0), (5, 6), (3, 6), (8, 2), (8, 5), (1, 2), (0, 4),
-(7, 0), (6, 7), (3, 2), (5, 2), (8, 4), (8, 1), (8, 7), (1, 1),
-(0, 3), (2, 0), (0, 6), (2, 6), (6, 0)}),
-actions= actions)
+actions = {d : frozenset({Action("move",d),Action("push",d)}) for d in 'udrl'}
 
+State = namedtuple('State',('me','boxes'))
+
+Predicat=namedtuple('Predicat',('goals','walls','actions')) 
+
+
+"""def initMap('/corri.txt'):
+    dic=main();
+    return s0,map_rules"""
+
+####################################
 def one_step(position, direction) : 
     i, j = position
     return {'r' : (i,j+1), 'l' : (i,j-1), 'u' : (i-1,j), 'd' : (i+1,j)}[direction]
-def free(position, map_rules) :        #on ajoute une fonction free pour chaque type de (fluent/constant) l'équivalent de !box(x,y),!demon(x,y),!trap(x,y)
+###################################
+def free(position, map_rules) :    
     return not(position in map_rules.walls)
+
+
 
 def do_fn(action, state) :
     X0 = state.me                               # on aura besoin de stocker temporairement les données le l'etat entré comme X0=state.me boxes1 = state.boxes
@@ -40,6 +43,16 @@ def do_fn(action, state) :
         else :
             return None
     return None
+
+
+
+
+
+
+
+
+
+
 
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
@@ -104,6 +117,6 @@ def search_with_parent(s0, goals, succ,
                 insert(s2, l)
     return None, save
 
-s_end, save = search_with_parent(s0, goals, succ,remove_head, insert_tail, debug=False)
+"""s_end, save = search_with_parent(s0, goals, succ,remove_head, insert_tail, debug=False)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
-print(plan)
+print(plan)"""
