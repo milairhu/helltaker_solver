@@ -11,7 +11,7 @@ Predicat = namedtuple(
 Action = namedtuple("action", ("verb", "direction"))
 actions = {
     d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"
-}  # toutes les actions
+}  # actions
 
 #################################### demoness_to_goal ne pas toucher & init_map à changer potentiellement mais fonctionnel
 
