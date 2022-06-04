@@ -1,16 +1,47 @@
 from collections import namedtuple
-Action = namedtuple('action',('verb','direction'))
+from helltaker_utils import grid_from_file
 
+State = namedtuple('state',('perso','soldat','piegeActive','porte','block','cle','chrono'))
+Predicat = namedtuple('Predicat',('goals','walls','actions')) 
+
+Action = namedtuple('action',('verb','direction'))
 actions = {d : frozenset({Action("move",d),Action("push",d)}) for d in 'udrl'}
 
-State = namedtuple('State',('me','boxes'))
 
-Predicat=namedtuple('Predicat',('goals','walls','actions')) 
+def initMap(filename: str):
+    dic = grid_from_file(filename)
+    tmp = {}
+    i = 0
+    j = 0
+    for line in dic["grid"]:
+        i += 1
+        j = 0
+        for cell in line:
+            j += 1
+            print(cell)
+            
+            match cell:
+                case "H" : tmp['perso'] = (i,j)
+    print(tmp)
+    return     
 
+"""
+    s0 = State(perso = (2, 2), boxes = frozenset({(4, 4), (3, 4), (6, 5), (6, 1), (6, 4), (2, 3), (6, 3)}))
 
-"""def initMap('/corri.txt'):
-    dic=main();
-    return s0,map_rules"""
+    Predicat = namedtuple('Predicat',('goals','walls','actions')) #doit contenir tout les constantes
+    map_rules = Predicat(goals= frozenset({(7, 4), (2, 1), (6, 6), (5, 4), (6, 3), (4, 1), (3, 5)}), 
+    walls = frozenset({(4, 0), (4, 3), (3, 1), (4, 6), (5, 7), (8, 0),
+    (0, 2), (8, 3), (0, 5), (8, 6), (1, 0), (1, 6), (7, 7), (4, 2),
+    (3, 0), (5, 0), (5, 6), (3, 6), (8, 2), (8, 5), (1, 2), (0, 4),
+    (7, 0), (6, 7), (3, 2), (5, 2), (8, 4), (8, 1), (8, 7), (1, 1),
+    (0, 3), (2, 0), (0, 6), (2, 6), (6, 0)}),
+    actions = actions)
+"""
+    
+
+#TODO for testing 
+initMap("./levels/tests/corridor.txt")
+
 
 ####################################
 def one_step(position, direction) : 
