@@ -9,9 +9,11 @@ Predicat = namedtuple(
 )  # predicats
 
 Action = namedtuple("action", ("verb", "direction"))
-actions = {d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"}
+actions = {
+    d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"
+}  # toutes les actions
 
-####################################
+#################################### demoness_to_goal ne pas toucher & init_map à changer potentiellement mais fonctionnel
 
 
 def demoness_to_goal(demonessPos: list, wallPos: list):
@@ -88,7 +90,6 @@ def init_map(filename: str):
                     tmp["block"].append((i, j))
                     tmp["trapUnSafe"].append((i, j))
     # init de s0
-    trapUnSafe = set(tmp["trapUnSafe"])
     s0 = State(
         hero=frozenset(tmp["hero"]),
         block=frozenset(tmp["block"]),
@@ -97,6 +98,7 @@ def init_map(filename: str):
         trapUnSafe=frozenset(tmp["trapUnSafe"]),
         max_steps=frozenset({dic["max_steps"]}),
     )
+    # init de map_rules
     map_rules = Predicat(
         goal=frozenset(demonessToGoal(tmp["demoness"], tmp["wall"])),
         demoness=frozenset(tmp["demoness"]),
@@ -108,28 +110,51 @@ def init_map(filename: str):
     return s0, map_rules
 
 
-####################################
+#################################### is_free_XXX pas terminé
+# TODO je crois que certaines sont inutiles, à la fin on pourra retirer celles qu'on n'utilise pas
+def is_free_demoness(position, map_rules):
+    return not (position in map_rules.demoness)
 
 
 def is_free_wall(position, map_rules):
-    return not (position in map_rules.walls)
+    return not (position in map_rules.wall)
 
 
-def is_free_mob(position, map_rules):
-    return not (position in map_rules["soldat"])
+def is_free_key(position, map_rules):
+    return not (position in map_rules.key)
 
 
 def is_free_lock(position, map_rules):
-    return not (position in map_rules["Porte"])
+    return not (position in map_rules.lock)
+
+
+def is_free_spikes(position, map_rules):
+    return not (position in map_rules.spikes)
+
+
+def is_free_hero(position, map_rules):
+    return not (position in map_rules.hero)
 
 
 def is_free_block(position, map_rules):
-    return not (position in map_rules["block"])
+    return not (position in map_rules.block)
 
 
-# And so on
+def is_free_mob(position, map_rules):
+    return not (position in map_rules.mob)
 
-####################################
+
+def is_free_trapSafe(position, map_rules):
+    return not (position in map_rules.trapSafe)
+
+
+def is_free_trapUnSafe(position, map_rules):
+    return not (position in map_rules.trapUnSafe)
+
+
+#################################### one_step ne pas toucher
+
+
 def one_step(position, direction):
     i, j = position
     return {"r": (i, j + 1), "l": (i, j - 1), "u": (i - 1, j), "d": (i + 1, j)}[
@@ -138,8 +163,6 @@ def one_step(position, direction):
 
 
 ###################################
-def free(position, map_rules):
-    return not (position in map_rules.walls)
 
 
 def do_fn(action, state):
@@ -221,9 +244,6 @@ def dict2path(s, d):
         s = parent
     l.reverse()
     return l
-
-
-###################################################
 
 
 ########################################################### cette partie est la derniere à modifier à mon avis, on utilisera une recherche non informé pour le moment
