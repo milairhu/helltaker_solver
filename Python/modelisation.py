@@ -11,8 +11,10 @@ Predicat = namedtuple(
 Action = namedtuple("action", ("verb", "direction"))
 actions = {d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"}
 
+####################################
 
-def demonessToGoal(demonessPos: list, wallPos: list):
+
+def demoness_to_goal(demonessPos: list, wallPos: list):
     goal = []
     print(demonessPos)
     for pair in demonessPos:
@@ -27,7 +29,7 @@ def demonessToGoal(demonessPos: list, wallPos: list):
     return goal
 
 
-def initMap(filename: str):
+def init_map(filename: str):
     dic = grid_from_file(filename)
     tmp = {}  # dictionnaire temporaire qui sera inséré dans les types immutables
     i = 0  # coordonnées
@@ -105,6 +107,27 @@ def initMap(filename: str):
     )
     return s0, map_rules
 
+
+####################################
+
+
+def is_free_wall(position, map_rules):
+    return not (position in map_rules.walls)
+
+
+def is_free_mob(position, map_rules):
+    return not (position in map_rules["soldat"])
+
+
+def is_free_lock(position, map_rules):
+    return not (position in map_rules["Porte"])
+
+
+def is_free_block(position, map_rules):
+    return not (position in map_rules["block"])
+
+
+# And so on
 
 ####################################
 def one_step(position, direction):
