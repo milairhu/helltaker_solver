@@ -20,7 +20,7 @@ def initMap(filename: str):
     # init des listes des objets possibles
     tmp["hero"] = []
     tmp["demon"] = []
-    tmp["mob"] = []
+    tmp["wall"] = []
     tmp["block"] = []
     tmp["key"] = []
     tmp["lock"] = []
@@ -46,7 +46,7 @@ def initMap(filename: str):
                 case "D":
                     tmp["demon"].append((i, j))
                 case "#":
-                    tmp["mob"].append((i, j))
+                    tmp["wall"].append((i, j))
                 case "B":
                     tmp["block"].append((i, j))
                 case "K":
@@ -80,27 +80,12 @@ def initMap(filename: str):
         trapUnSafe=frozenset(tmp["trapUnSafe"]),
         max_steps=frozenset({dic["max_steps"]}),
     )
-    map_rules = Predicat(goal=frozenset({}), demoness=frozenset({}), wall=frozenset({}), key=frozenset({}), lock=frozenset({}), spikes=frozenset({}), actions=frozenset({})) #TODO goal
-    Predicat = namedtuple(
+    map_rules = Predicat(goal=frozenset({}), demoness=frozenset({}), wall=frozenset(tmp["wall"]), key=frozenset({}), lock=frozenset({}), spikes=frozenset({}), actions=frozenset({})) #TODO goal
+    """Predicat = namedtuple(
     "Predicat", ("goal", "demoness", "wall", "key", "lock", "spikes", "actions")
-    )  # predicats
-    print(map_rules)
+    )  # predicats"""
+    print(map_rules) #TODO for debugging
     return s0, map_rules
-
-"""
-map_rules = Predicat(
-    goal=frozenset({(7, 4), (2, 1), (6, 6), (5, 4), (6, 3), (4, 1), (3, 5)}),
-    demoness=frozenset({}),
-    wall=frozenset({(4, 0), (4, 3)}),
-    key=frozenset({}),
-    lock=frozenset({}),
-    spikes=frozenset({}),
-    actions=actions,
-)"""
-"""
-    Predicat = namedtuple('Predicat',('goals','walls','actions')) #doit contenir tout les constantes
-    
-"""
 
 
 # TODO remove, only for testing initMap
