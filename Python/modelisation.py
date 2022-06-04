@@ -16,10 +16,14 @@ def demonessToGoal(demonessPos: list, wallPos: list):
     goal = []
     print(demonessPos)
     for pair in demonessPos:
-        if not ((pair[0] + 1, pair[1]) in wallPos): goal.append((pair[0] + 1, pair[1]))
-        if not ((pair[0] - 1, pair[1]) in wallPos): goal.append((pair[0] - 1, pair[1]))
-        if not ((pair[0], pair[1] + 1) in wallPos): goal.append((pair[0], pair[1] + 1))
-        if not ((pair[0], pair[1] - 1) in wallPos): goal.append((pair[0], pair[1] - 1))
+        if not ((pair[0] + 1, pair[1]) in wallPos):
+            goal.append((pair[0] + 1, pair[1]))
+        if not ((pair[0] - 1, pair[1]) in wallPos):
+            goal.append((pair[0] - 1, pair[1]))
+        if not ((pair[0], pair[1] + 1) in wallPos):
+            goal.append((pair[0], pair[1] + 1))
+        if not ((pair[0], pair[1] - 1) in wallPos):
+            goal.append((pair[0], pair[1] - 1))
     return goal
 
 
@@ -98,13 +102,8 @@ def initMap(filename: str):
         key=frozenset(tmp["key"]),
         lock=frozenset(tmp["lock"]),
         spikes=frozenset(tmp["spikes"]),
-    )  #TODO actions
-    print(map_rules)  # TODO for debugging
+    )
     return s0, map_rules
-
-
-# TODO remove, only for testing initMap
-initMap("./levels/level5.txt")
 
 
 ####################################
