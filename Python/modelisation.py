@@ -5,11 +5,22 @@ State = namedtuple(
     "State", ("hero", "block", "mob", "trapSafe", "trapUnSafe", "max_steps")
 )  # fluents
 Predicat = namedtuple(
-    "Predicat", ("goal", "demoness", "wall", "key", "lock", "spikes", "actions")
+    "Predicat", ("goal", "demoness", "wall", "key", "lock", "spikes")
 )  # predicats
 
 Action = namedtuple("action", ("verb", "direction"))
 actions = {d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"}
+
+
+def demonessToGoal(demonessPos: list, wallPos: list):
+    goal = []
+    print(demonessPos)
+    for pair in demonessPos:
+        if not ((pair[0] + 1, pair[1]) in wallPos): goal.append((pair[0] + 1, pair[1]))
+        if not ((pair[0] - 1, pair[1]) in wallPos): goal.append((pair[0] - 1, pair[1]))
+        if not ((pair[0], pair[1] + 1) in wallPos): goal.append((pair[0], pair[1] + 1))
+        if not ((pair[0], pair[1] - 1) in wallPos): goal.append((pair[0], pair[1] - 1))
+    return goal
 
 
 def initMap(filename: str):
@@ -81,19 +92,19 @@ def initMap(filename: str):
         max_steps=frozenset({dic["max_steps"]}),
     )
     map_rules = Predicat(
-        goal=frozenset({}),
+        goal=frozenset(demonessToGoal(tmp["demoness"], tmp["wall"])),
         demoness=frozenset(tmp["demoness"]),
         wall=frozenset(tmp["wall"]),
         key=frozenset(tmp["key"]),
         lock=frozenset(tmp["lock"]),
         spikes=frozenset(tmp["spikes"]),
-        actions=frozenset({}),
-    )  # TODO goal & TODO actions
+    )  #TODO actions
     print(map_rules)  # TODO for debugging
     return s0, map_rules
 
+
 # TODO remove, only for testing initMap
-initMap("./levels/level7.txt")
+initMap("./levels/level5.txt")
 
 
 ####################################
