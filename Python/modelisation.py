@@ -19,7 +19,7 @@ def initMap(filename: str):
     j = 0  # coordonnées
     # init des listes des objets possibles
     tmp["hero"] = []
-    tmp["demon"] = []
+    tmp["demoness"] = []
     tmp["wall"] = []
     tmp["block"] = []
     tmp["key"] = []
@@ -42,9 +42,9 @@ def initMap(filename: str):
             j += 1
             match cell:
                 case "H":
-                    tmp["hero"].append((i,j))
+                    tmp["hero"].append((i, j))
                 case "D":
-                    tmp["demon"].append((i, j))
+                    tmp["demoness"].append((i, j))
                 case "#":
                     tmp["wall"].append((i, j))
                 case "B":
@@ -80,13 +80,17 @@ def initMap(filename: str):
         trapUnSafe=frozenset(tmp["trapUnSafe"]),
         max_steps=frozenset({dic["max_steps"]}),
     )
-    map_rules = Predicat(goal=frozenset({}), demoness=frozenset({}), wall=frozenset(tmp["wall"]), key=frozenset({}), lock=frozenset({}), spikes=frozenset({}), actions=frozenset({})) #TODO goal
-    """Predicat = namedtuple(
-    "Predicat", ("goal", "demoness", "wall", "key", "lock", "spikes", "actions")
-    )  # predicats"""
-    print(map_rules) #TODO for debugging
+    map_rules = Predicat(
+        goal=frozenset({}),
+        demoness=frozenset(tmp["demoness"]),
+        wall=frozenset(tmp["wall"]),
+        key=frozenset(tmp["key"]),
+        lock=frozenset(tmp["lock"]),
+        spikes=frozenset(tmp["spikes"]),
+        actions=frozenset({}),
+    )  # TODO goal & TODO actions
+    print(map_rules)  # TODO for debugging
     return s0, map_rules
-
 
 # TODO remove, only for testing initMap
 initMap("./levels/level7.txt")
