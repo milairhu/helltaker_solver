@@ -9,7 +9,7 @@ Predicat = namedtuple("Predicat", ("goal", "wall", "spikes"))  # predicats
 
 Action = namedtuple("action", ("verb", "direction"))
 actions = {
-    d: frozenset({Action("move", d), Action("pushMob", d), Action("pushBlock", d)})
+    d: frozenset({Action("move", d), Action("pushMob", d), Action("killMobObject", d),Action("openLock", d),Action("pushBlock", d),Action("tapBlock", d)})
     for d in "udrl"
 }  # actions
 
@@ -193,7 +193,7 @@ def do_fn(action, state, map_rules):
                 max_steps_ -= 2
             else:
                 max_steps_ -= 1
-            if(not is_free_key(X1,state)):key_=0
+            if(not is_free_key(X1,state)):key_=frozenset({})
             return State(
                 hero=X1,
                 block=block_,
@@ -208,7 +208,7 @@ def do_fn(action, state, map_rules):
             return None
 
     if (
-        action.verb == "pushSoldat"
+        action.verb == "pushMob"
     ):  # without killing him against an object other than traps
         X2 = one_step(X1, action.direction)
         if not is_free_mob(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state)and is_free_spikes(X2, map_rules):
@@ -258,19 +258,17 @@ def do_fn(action, state, map_rules):
             and is_free_block(X1, state)
             and is_free_mob(X1, state)
             and not is_free_lock(X1, state)
-            and is_free_key(X1, state)
-            and is_free_trapSafe(X1, state)
-            and is_free_trapUnSafe(X1, state)
-            and is_free_spikes(X1, map_rules)
-            and key_ == frozenset({})  # Le joueur possède la clef
+            and len(State.key)==0  # Le joueur possède la clef
         ):
-            newMob = list(state.mob)
-            newMob = [x for x in newMob if x not in list(trapSafe_)]
-            max_steps_ -= 1
+            newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
+            if not is_free_trapSafe(X1, state) or not is_free_spikes(X1, map_rules):
+                max_steps_ -= 2
+            else:
+                max_steps_ -= 1
             return State(
                 hero=X1,
                 block=block_,
-                mob=newMob,
+                mob=frozenset(newMob),
                 trapSafe=trapUnSafe_,
                 trapUnSafe=trapSafe_,
                 max_steps=max_steps_,
@@ -279,7 +277,49 @@ def do_fn(action, state, map_rules):
             )  # swap trapsafe with trapsUnsafe
         else:
             return None
-
+    if action.verb == "pushBlock":
+        X2 = one_step(X1, action.direction)
+        if not is_free_block(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state):
+            newBlock = list(state.block)
+            newBlock.add(X2)
+            newBlock.remove(X1)
+            newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
+            if not is_free_trapSafe(X0, state) or not is_free_spikes(X0, map_rules):
+                max_steps_ -= 2
+            else:
+                max_steps_ -= 1
+            return State(
+                hero=X0,
+                block=frozenset(newBlock),
+                mob=frozenset(newMob),
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=lock_,
+                key=key_,
+            )
+        else:
+            return None
+    if action.verb == "tapBlock":
+        X2 = one_step(X1, action.direction)
+        if not is_free_block(X1,state) and (not is_free_wall(X2, map_rules) or not is_free_block(X2, state)or not is_free_mob(X2, state) or not is_free_lock(X2, state)):
+            newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
+            if not is_free_trapSafe(X0, state) or not is_free_spikes(X0, map_rules):
+                max_steps_ -= 2
+            else:
+                max_steps_ -= 1
+            return State(
+                hero=X0,
+                block=block_,
+                mob=frozenset(newMob),
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=lock_,
+                key=key_,
+            )
+        else:
+            return None
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
 """def succ_factory(rules) :
@@ -305,7 +345,7 @@ def succ(state, rules):
 
 
 def goals(state, rules):
-    return state.boxes == rules.goals
+    return (list(state.hero)[0] in list(rules.goals))
 
 
 def insert_tail(s, l):
@@ -333,7 +373,7 @@ def dict2path(s, d):
 
 ########################################################### cette partie est la derniere à modifier à mon avis, on utilisera une recherche non informé pour le moment
 # dés que tout fonctionne, on peut faire une recherche informée
-def search_with_parent(s0, goals, succ, remove, insert, debug=True):
+def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     l = [s0]
     save = {s0: None}
     s = s0
@@ -341,7 +381,7 @@ def search_with_parent(s0, goals, succ, remove, insert, debug=True):
         if debug:
             print("l =", l)
         s, l = remove(l)
-        for s2, a in succ(s, map_rules).items():
+        for s2, a in succ(s, actions).items():
             if not s2 in save:
                 save[s2] = (s, a)
                 if goals(s2, map_rules):
