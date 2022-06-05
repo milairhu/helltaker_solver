@@ -15,10 +15,8 @@ actions = {
 
 #################################### demoness_to_goal ne pas toucher & init_map à changer potentiellement mais fonctionnel
 
-
 def demoness_to_goal(demonessPos: list, wallPos: list):
     goal = []
-    print(demonessPos)
     for pair in demonessPos:
         if not ((pair[0] + 1, pair[1]) in wallPos):
             goal.append((pair[0] + 1, pair[1]))
@@ -37,7 +35,6 @@ def init_map(filename: str):
     i = 0  # coordonnées
     j = 0  # coordonnées
     # init des listes des objets possibles
-    tmp["hero"] = []
     tmp["demoness"] = []
     tmp["wall"] = []
     tmp["block"] = []
@@ -61,7 +58,7 @@ def init_map(filename: str):
             j += 1
             match cell:
                 case "H":
-                    tmp["hero"].append((i, j))
+                    tmp["hero"]=(i, j)
                 case "D":
                     tmp["demoness"].append((i, j))
                     tmp["wall"].append((i, j))
@@ -92,20 +89,19 @@ def init_map(filename: str):
                     tmp["trapUnSafe"].append((i, j))
     # init de s0
     s0 = State(
-        hero=frozenset(tmp["hero"]),
+        hero=tmp["hero"],
         block=frozenset(tmp["block"]),
         mob=frozenset(tmp["mob"]),
         trapSafe=frozenset(tmp["trapSafe"]),
         trapUnSafe=frozenset(tmp["trapUnSafe"]),
+        lock=frozenset(tmp["lock"]),
         max_steps=dic["max_steps"],
+        key=frozenset(tmp["key"]),
     )
     # init de map_rules
     map_rules = Predicat(
         goal=frozenset(demoness_to_goal(tmp["demoness"], tmp["wall"])),
-        demoness=frozenset(tmp["demoness"]),
         wall=frozenset(tmp["wall"]),
-        key=frozenset(tmp["key"]),
-        lock=frozenset(tmp["lock"]),
         spikes=frozenset(tmp["spikes"]),
     )
     return s0, map_rules
@@ -157,14 +153,15 @@ def is_free_trapUnSafe(position, map_rules):
 
 
 def one_step(position, direction):
+    #print("############################## 1",position)
     i, j = position
+    #print("############################## apres list",i,j)
     return {"r": (i, j + 1), "l": (i, j - 1), "u": (i - 1, j), "d": (i + 1, j)}[
         direction
     ]
 
 
 ###################################
-
 
 def do_fn(action, state, map_rules):
     X0 = state.hero
@@ -178,7 +175,10 @@ def do_fn(action, state, map_rules):
     wall_ = map_rules.wall
     goal_ = map_rules.goal
     spikes_ = map_rules.spikes
-    X1 = one_step(X0, action.direction)
+    #print("###################################################","X0 avant one_step est ",X0,"l'action : ",action.verb)
+    X1 =one_step(X0, action.direction)
+    #print("###################################################","X1 apres one_step est ",X1,type(X1),"l'action : ",action.verb)
+    if (state.max_steps<=0): return None
     if action.verb == "move":
         if (
             is_free_wall(X1, map_rules)
@@ -329,12 +329,12 @@ def do_fn(action, state, map_rules):
     return succ"""
 
 
-def succ(state, rules):
+def succ(state, actions,map_rules):
     dic = {}
-    for a in rules.actions:
-        for n in rules.actions[a]:
-            if do_fn(n, state) != None:
-                dic[do_fn(n, state)] = a
+    for a in actions:
+        for n in actions[a]:
+            if do_fn(n, state,map_rules) != None: #à refaire on calcul Deux fois
+                dic[do_fn(n, state,map_rules)] = a
     return dic
 
 
@@ -345,7 +345,7 @@ def succ(state, rules):
 
 
 def goals(state, rules):
-    return (list(state.hero)[0] in list(rules.goals))
+    return (state.hero in list(rules.goal))
 
 
 def insert_tail(s, l):
@@ -379,9 +379,11 @@ def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=
     s = s0
     while l:
         if debug:
-            print("l =", l)
+            print("l =", l,'\n')
         s, l = remove(l)
-        for s2, a in succ(s, actions).items():
+        #print(" N FOIS ####### \n")
+        for s2, a in succ(s, actions,map_rules).items():
+            #print(" N FOIS ####### \n")
             if not s2 in save:
                 save[s2] = (s, a)
                 if goals(s2, map_rules):
@@ -393,3 +395,19 @@ def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=
 """s_end, save = search_with_parent(s0, goals, succ,remove_head, insert_tail, debug=False)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
 print(plan)"""
+
+################################################### test
+# test map 
+s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/traps1.txt')
+#print(s0,"\n ##########################################")
+#print(map_rules)
+#x=frozenset((1,2))
+#a,b=one_step(x,'r')
+#print(b)
+#print(s0)
+#print(map_rules)
+#print(goals(s0,map_rules))
+print(map_rules)
+s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+plan = ''.join([a for s,a in dict2path(s_end,save) if a])
+print(plan)
