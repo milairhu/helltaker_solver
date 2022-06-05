@@ -206,18 +206,17 @@ def do_fn(action, state, map_rules):
         else:
             return None
 
-    if action.verb == "push":
+    if action.verb == "pushSoldat":
         X2 = one_step(X1, action.direction)
-        if X1 in boxes1 and free(X2, map_rules) and not (X2 in boxes1):
-            newBox = set(boxes1)
-            newBox.add(X2)
-            newBox.remove(X1)
-            return State(boxes=frozenset(newBox), me=X1)
-            # return State(boxes={X2} | boxes1 - {X1} ,me=X1) #ce retour est faux ! apparement le type de retour ici n'est pas un State alors pas hashable
-            # alors vaut mieux prendre son temps et transformer le frozenset en set normal, faire les modifications adéquates, puis un retour simple de type State !!!!!!!!!!!!!!!!
+        if X1 in mob_ and is_free_wall(X2, map_rules)and is_free_block(X2, action)and is_free_mob(X2, action)and is_free_lock(X2, action)and is_free_key(X2, action)and is_free_spikes(X2, map_rules):
+            newMob=list(state.mob)
+            newMob.add(X2)
+            newMob.remove(X1)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            max_steps_ -= 1
+            return State(hero=X0,block=block_,mob=frozenset(newMob),trapSafe=trapUnSafe_,trapUnSafe=trapSafe_,max_steps=max_steps_,lock=lock_,key=key_,)
         else:
             return None
-    return None
 
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
