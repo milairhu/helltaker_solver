@@ -6,10 +6,6 @@
 - ajouter toutes les actions possibles effectuables comme push, move, ...
     
     
-    - pushSoldat vers block 4 directions
-    A
-    - casserSoldat contre mur (quand contre mur (et block? et soldat? et porte? A TRANCHER : a priori se casse partout))
-    
     - Taper le Block (le block ne bouge pas, le perso non plus, on a juste utilisé un coup pour perdre du temps : si bloc,mur ou soldat derrière) = PushBlockContreBlockB
     - Taper le Block vers soldat = PushBlockContreSoldatD
     - PushBlockContreMurD

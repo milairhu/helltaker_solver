@@ -64,6 +64,7 @@ def init_map(filename: str):
                     tmp["hero"].append((i, j))
                 case "D":
                     tmp["demoness"].append((i, j))
+                    tmp["wall"].append((i, j))
                 case "#":
                     tmp["wall"].append((i, j))
                 case "B":
