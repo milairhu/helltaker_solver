@@ -176,6 +176,7 @@ def do_fn(action, state, map_rules):
     wall_ = map_rules.wall
     goal_ = map_rules.goal
     spikes_ = map_rules.spikes
+    #print("################################################# CLE",State.key)
     #print("###################################################","X0 avant one_step est ",X0,"l'action : ",action.verb)
     X1 =one_step(X0, action.direction)
     #print("###################################################","X1 apres one_step est ",X1,type(X1),"l'action : ",action.verb)
@@ -258,7 +259,7 @@ def do_fn(action, state, map_rules):
             and is_free_block(X1, state)
             and is_free_mob(X1, state)
             and not is_free_lock(X1, state)
-            and len(State.key)==0  # Le joueur possède la clef
+            and not State.key  # Le joueur possède la clef
         ):
             newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
             if not is_free_trapSafe(X1, state) or not is_free_spikes(X1, map_rules):
@@ -398,7 +399,7 @@ print(plan)"""
 
 ################################################### test
 # test map 
-s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/traps1.txt')
+s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/locknkey.txt')
 #print(s0,"\n ##########################################")
 #print(map_rules)
 #x=frozenset((1,2))
@@ -407,7 +408,7 @@ s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/traps1.txt')
 #print(s0)
 #print(map_rules)
 #print(goals(s0,map_rules))
-print(map_rules)
-s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+print(s0)
+s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=True)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
 print(plan)
