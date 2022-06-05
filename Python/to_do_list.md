@@ -2,6 +2,13 @@
 
 ## Partie Modélisation
 ### TODO
+- factory(patron de conception) pour is_free_xxx
+- de meme pour map_rules
+- de meme pour goals(pas necessaire je crois) 
+- recherche informé hh A*
+
+
+
 - ajouterDemoness to wall en s0
 - ajouter toutes les actions possibles effectuables comme push, move, ...
     
