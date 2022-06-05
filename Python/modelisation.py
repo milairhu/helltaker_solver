@@ -2,15 +2,15 @@ from collections import namedtuple
 from helltaker_utils import grid_from_file
 
 State = namedtuple(
-    "State", ("hero", "block", "mob", "trapSafe", "trapUnSafe", "max_steps")
+    "State", ("hero", "block", "mob", "trapSafe", "trapUnSafe", "max_steps", "lock", "key")
 )  # fluents
 Predicat = namedtuple(
-    "Predicat", ("goal", "demoness", "wall", "key", "lock", "spikes")
+    "Predicat", ("goal", "wall", "spikes")
 )  # predicats
 
 Action = namedtuple("action", ("verb", "direction"))
 actions = {
-    d: frozenset({Action("move", d), Action("push", d)}) for d in "udrl"
+    d: frozenset({Action("move", d), Action("pushMob", d), Action("pushBlock", d)}) for d in "udrl"
 }  # actions
 
 #################################### demoness_to_goal ne pas toucher & init_map à changer potentiellement mais fonctionnel
@@ -96,7 +96,7 @@ def init_map(filename: str):
         mob=frozenset(tmp["mob"]),
         trapSafe=frozenset(tmp["trapSafe"]),
         trapUnSafe=frozenset(tmp["trapUnSafe"]),
-        max_steps=frozenset({dic["max_steps"]}),
+        max_steps=dic["max_steps"]
     )
     # init de map_rules
     map_rules = Predicat(
@@ -165,23 +165,27 @@ def one_step(position, direction):
 ###################################
 
 
-def do_fn(action, state):
-    X0 = (
-        state.me
-    )  # on aura besoin de stocker temporairement les données le l'etat entré comme X0=state.me boxes1 = state.boxes
-    boxes1 = (
-        state.boxes
-    )  # alors je pense que c'est mieux d'avoir une variable pour tous les prédicat/fluents afin de les manipuler facilement
-    X1 = one_step(
-        X0, action.direction
-    )  # et vérifier les pré condition de chaque action.
+def do_fn(action, state,map_rules):
+    X0 = state.hero
+    block_=state.block
+    mob_=state.mob
+    trapSafe_=state.trapSafe
+    trapUnSafe_=state.trapUnSafe
+    max_steps_=state.max_steps
+    key_=state.key
+    lock_=state.lock
+    wall_ =map_rules.wall
+    goal_= map_rules.goal
+    spikes_=map_rules.spikes
+    X1 = one_step(X0, action.direction)  
     if action.verb == "move":
-        if free(X1, map_rules) and not (X1 in boxes1):
-            return State(
-                me=X1, boxes=boxes1
-            )  # LE PLUS IMPORTANT est d'avoir comme retour un type State qui est immutable alors hashable
+        if is_free_wall(X1, map_rules) and  is_free_block(X1,action) and is_free_mob(X1,action) and is_free_lock(X1,action) and is_free_key(X1,action) and is_free_trapSafe(X1,action) and is_free_trapUnSafe(X1,action) and is_free_spikes(X1,map_rules):
+            newMob = [x for x in list(mob_) if x not in list(trapSafe_)] # we will add it every time, basically if there is an existing mob in a spike it kills it 
+            max_steps_-=1
+            return State(hero=X1,block=block_,mob=newMob,trapSafe=trapUnSafe_,trapUnSafe=trapSafe_,max_steps=max_steps_,lock=lock_,key=key_)#swap trapsafe with trapsUnsafe
         else:
             return None
+    
     if action.verb == "push":
         X2 = one_step(X1, action.direction)
         if X1 in boxes1 and free(X2, map_rules) and not (X2 in boxes1):
