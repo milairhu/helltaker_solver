@@ -1,5 +1,6 @@
 from collections import namedtuple
 from helltaker_utils import grid_from_file
+import time
 
 State = namedtuple(
     "State",
@@ -337,8 +338,8 @@ def dict2path(s, d):
     l.reverse()
     return l
 
-##########################################################
-def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
+######################################### recherche par lageur d'abord avec sauvegarde des états ######################################
+def BFS(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     l = [s0]
     save = {s0: None}
     s = s0
@@ -353,7 +354,71 @@ def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=
                     return s2, save
                 insert(s2, l)
     return None, save
-s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level2.txt')
-s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+
+######################################### recherche en profondeur avec sauvegarde des états #########################
+def DFS(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
+    l = [s0]
+    save = {s0: None}
+    s = s0
+    while l:
+        if debug:
+            print("l : ",l,'\n')# suivi précis:  print("keys : ",l[0].key,"hero : ",l[0].hero,"steps left :",l[0].max_steps,'\n')
+        s, l = remove(l)
+        for s2, a in succ(s, actions,map_rules).items():
+            if not s2 in save:
+                save[s2] = (s, a)
+                if goals(s2, map_rules):
+                    return s2, save
+                insert(s2, l)
+    return None, save
+###########################################################"
+# Astar
+def distManhattan(startingPoint, endPoint):
+    x1, y1 = startingPoint[0],startingPoint[1]
+    x2, y2 = endPoint[0], endPoint[1]
+    dist = abs(x1 - x2) + abs(y1 - y2)
+    return dist
+def nearestGoal(position,goals):
+    x=float('inf')
+    for min in goals.goal:
+     if x>=distManhattan(position,min):
+         x=distManhattan(position,min)
+         y=min
+    return y
+
+
+def Astar(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
+    l = [(s0,distManhattan(s0.hero,nearestGoal(s0.hero,map_rules)))]
+    save = {s0: None}
+    s = s0
+    while l:
+        if debug:
+            print("l : ",l,'\n')
+            #print("keys : ",l[0][0].key,"hero : ",l[0][0].hero,"steps left :",l[0][0].max_steps," heuristique",l[0][1],'\n')
+        l.sort(key=lambda x:x[1])
+        s, l = remove(l)
+        for s2, a in succ(s[0], actions,map_rules).items():
+            if not s2 in save:
+                save[s2] = (s[0], a)
+                if goals(s2, map_rules):
+                    return s2, save
+                insert((s2,distManhattan(s2.hero,nearestGoal(s2.hero,map_rules))+ s[1] - distManhattan(s[0].hero,nearestGoal(s[0].hero,map_rules))+1),l)
+    return None, save
+
+
+
+####################################################################################################""
+t0 = time.time()
+s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level1.txt')
+
+#s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
+#s_end, save = Astar(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
-print(plan)
+
+t1 = time.time()
+total = t1-t0
+#print(plan,"Breadth-First Search -> Execution time : ",total)
+print(plan,"Depth First Search -> Execution time : ",total)
+#print(plan,"A* -> Execution time : ",total)

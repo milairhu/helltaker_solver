@@ -2,10 +2,13 @@
 
 ## Partie Modélisation
 ### TODO
+- rédaction rapport en prenant en considération le temps d'execution de chaque niveau dans la partie statistique
+* factory pas obligatoire mais je pense que le prof peut insister sur ce point(l'élégance et la pertinance du code)
 - factory(patron de conception) pour is_free_xxx
 - de meme pour map_rules
 - de meme pour goals(pas necessaire je crois) 
-- recherche informé hh A*
+###
+
 
 
 
