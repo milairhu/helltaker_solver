@@ -209,7 +209,7 @@ EFFECT : ¬soldat(x',y))
 
 --------------------------------------------------------------------------------------------------------------
 
-Obtenir une Clé : Action? ou juste un booléen dans programme?
+Obtenir une Clé : 
 
 Action(ObtenirCléD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y') ∧ ¬aClé
@@ -323,6 +323,7 @@ Action(PushBlockContrePorteB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ inc(x,x") ∧block(x',y) ∧ porte(x",y) 
 EFFECT : )
 
+-- On peut de même taper sur une porte, lorsqu'on a pas la clé.
 
 -----------------------------------------------------------------------------------------------
 
