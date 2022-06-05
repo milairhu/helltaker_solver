@@ -198,7 +198,7 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
             return State(
                 hero=X1,
                 block=block_,
-                mob=newMob,
+                mob=frozenset(newMob),
                 trapSafe=trapUnSafe_,
                 trapUnSafe=trapSafe_,
                 max_steps=max_steps_,
@@ -207,6 +207,7 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
             )  # swap trapsafe with trapsUnsafe
         else:
             return None
+<<<<<<< HEAD
     ##### push mob to empty spot #####
     if action.verb == "pushMob":
         X2 = one_step(X1, action.direction)
@@ -220,10 +221,18 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
             and is_free_spikes(X2, map_rules)
         ):
             newMob = list(state.mob)
+=======
+
+    if action.verb == "pushSoldat":
+        X2 = one_step(X1, action.direction)
+        if X1 in mob_ and is_free_wall(X2, map_rules)and is_free_block(X2, action)and is_free_mob(X2, action)and is_free_lock(X2, action)and is_free_key(X2, action)and is_free_spikes(X2, map_rules):
+            newMob=list(state.mob)
+>>>>>>> 3fa0932194ac69aa0ea534b5a740259f1f4ff87b
             newMob.add(X2)
             newMob.remove(X1)
             newMob = [x for x in newMob if x not in list(trapSafe_)]
             max_steps_ -= 1
+<<<<<<< HEAD
             return State(
                 hero=X0,
                 block=block_,
@@ -291,6 +300,9 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
                 lock=frozenset({}),
                 key=key_,
             )  # swap trapsafe with trapsUnsafe
+=======
+            return State(hero=X0,block=block_,mob=frozenset(newMob),trapSafe=trapUnSafe_,trapUnSafe=trapSafe_,max_steps=max_steps_,lock=lock_,key=key_,)
+>>>>>>> 3fa0932194ac69aa0ea534b5a740259f1f4ff87b
         else:
             return None
 
