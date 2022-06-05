@@ -8,7 +8,7 @@ from clingo.control import Control
 
 
 
-
+#########" ETAT ACTUEL : ne marche pas pour trape : on modifie Frame Problem :erreur vient de Frame Problem qui force continuité ou de switchTrap?
 
 ################## Infos sur la grille ####################
 
@@ -65,6 +65,8 @@ def liste_actions() ->str:
     takeKeyDown;takeKeyUp;takeKeyLeft;takeKeyRight;\
     unlockLeft; unlockRight; unlockUp; unlockDown;\
     hitLockLeft;hitLockRight;hitLockUp;hitLockDown;\
+    hitBlockLeft;hitBlockRight;hitBlockUp;hitBlockDown;\
+    damage;\
     nop).\n\n"
 
 #Voir aClé, différent des autres
@@ -73,6 +75,7 @@ def grid_to_faits() -> str :
     global infosGrille
     res=""
 
+    # Attention : U et T (et Q et P) : ça ou l'inverse?
 
     for ligne in range(0,infosGrille["m"]):
         for col in range(0,infosGrille["n"]):
@@ -143,11 +146,24 @@ def generateur() ->str:
 def frame_problem() ->str:
     res="""
 %%% Frame Problem
-% les fluents qui n'ont pas ete supprimes restent a leur valeur
+% les fluents qui n'ont pas ete supprimes restent a leur valeur, sauf les trapOn/Off
+
+removed(trapOn(X,Y),T+1) :- 
+    fluent(trapOn(X,Y),T),
+    T+1<horizon.
+    
+removed(trapOff(X,Y),T+1) :- 
+    fluent(trapOff(X,Y),T),
+    T+1<horizon.   
+    
+
+
 fluent(F, T + 1) :-
 fluent(F, T),
     T + 1 < horizon,
     not removed(F, T).
+    
+
 
 % apres la fin, plus rien ne bouge
 fluent(F, T + 1) :-
@@ -158,6 +174,50 @@ fluent(F, T + 1) :-
 """
     return res
 
+
+##### Gestion des dégats : 
+def damage()->str:
+    res="""
+    %%% Gestion des degats
+    
+%si le mouvement precedent est != degat et que perso est sur spikes ou trapOn, il subit un tour de penalite 
+
+do(damage,T+1) :- 
+    T<horizon,
+    fluent(at(X,Y),T+1),
+    spike(X,Y),
+    not do(damage,T).
+
+do(damage,T+1) :- 
+    T<horizon,
+    fluent(at(X,Y),T+1),
+    fluent(trapOn(X,Y),T+1),
+    not do(damage,T).    
+
+    """
+
+    return res
+
+
+
+##### Gestion Trap On/Off : alternance sauf si dégats
+def switchTrap() ->str :
+    res="""
+%%% Gestion Trap On/Off : alternance sauf si degats
+
+fluent(trapOn(X,Y),T+1):-
+    fluent(trapOff(X,Y),T),
+    T<horizon,
+    not do(damage,T).
+ 
+fluent(trapOff(X,Y),T+1):-
+    fluent(trapOn(X,Y),T),
+    T<horizon,
+    not do(damage,T).   
+     
+    """
+
+    return res
 
 ##### Actions possibles
 def simpleMouv() ->str:
@@ -189,14 +249,7 @@ def simpleMouv() ->str:
     fluent(at(X, Y), T),
     fluent(key(X, Y - 1), T).
     
-:-  do(left, T),
-    fluent(at(X, Y), T),
-    fluent(spike(X, Y - 1), T). 
-    
-:-  do(left, T),
-    fluent(at(X, Y), T),
-    fluent(trapOff(X, Y - 1), T). 
-    
+
 % effets
 fluent(at(X, Y - 1), T + 1) :-
     do(left, T),
@@ -232,13 +285,7 @@ removed(at(X, Y), T) :-
     fluent(at(X, Y), T),
     fluent(key(X, Y + 1), T).
     
-:-  do(right, T),
-    fluent(at(X, Y), T),
-    fluent(spike(X, Y + 1), T).    
-    
-:-  do(right, T),
-    fluent(at(X, Y), T),
-    fluent(trapOff(X, Y + 1), T). 
+ 
     
 % effets
 fluent(at(X, Y + 1), T + 1) :-
@@ -277,14 +324,7 @@ removed(at(X, Y), T) :-
     fluent(at(X, Y), T),
     fluent(key(X+1, Y), T).
 
-:-  do(down, T),
-    fluent(at(X, Y), T),
-    fluent(spike(X+1, Y), T).
 
-
-:-  do(down, T),
-    fluent(at(X, Y), T),
-    fluent(trapOff(X+1, Y), T).
  
 % effets
 fluent(at(X+ 1, Y ), T + 1) :-
@@ -327,13 +367,7 @@ removed(at(X, Y), T) :-
     fluent(at(X, Y), T),
     fluent(key(X-1, Y ), T). 
     
-:-  do(up, T),
-    fluent(at(X, Y), T),
-    fluent(spike(X-1, Y ), T). 
-        
-:-  do(up, T),
-    fluent(at(X, Y), T),
-    fluent(trapOff(X-1, Y ), T).
+
     
 % effets
 fluent(at(X-1, Y ), T + 1) :-
@@ -594,7 +628,7 @@ fluent(mob(X, Y - 2), T + 1) :-
     not fluent(mob(X,Y-2),T),
     not fluent(lock(X,Y-2),T),
     not mur(X,Y-2),
-    not fluent(spike(X,Y-2),T),
+    not spike(X,Y-2),
     not fluent(trapOff(X,Y-2),T).
 
 removed(mob(X, Y-1), T) :-
@@ -604,7 +638,7 @@ removed(mob(X, Y-1), T) :-
     not fluent(mob(X,Y-2),T),
     not fluent(lock(X,Y-2),T),
     not mur(X,Y-2),
-    not fluent(spike(X,Y-2),T),
+    not spike(X,Y-2),
     not fluent(trapOff(X,Y-2),T).
 
     % quand le mob se casse : plusieurs possibilités
@@ -631,7 +665,7 @@ removed(mob(X, Y-1), T) :-
 removed(mob(X, Y-1), T) :-
     do(pushMobleft, T),
     fluent(at(X, Y), T),
-    fluent(spike(X,Y-2),T).    
+    spike(X,Y-2).    
     
 removed(mob(X, Y-1), T) :-
     do(pushMobleft, T),
@@ -673,7 +707,7 @@ fluent(mob(X, Y + 2), T + 1) :-
     not fluent(mob(X,Y+2),T),
     not fluent(lock(X,Y+2),T),
     not mur(X,Y+2),
-    not fluent(spike(X,Y+2),T),
+    not spike(X,Y+2),
     not fluent(trapOff(X,Y+2),T).
 
 removed(mob(X, Y+1), T) :-
@@ -683,7 +717,7 @@ removed(mob(X, Y+1), T) :-
     not fluent(mob(X,Y+2),T),
     not fluent(lock(X,Y+2),T),
     not mur(X,Y+2),
-    not fluent(spike(X,Y+2),T),
+    not spike(X,Y+2),
     not fluent(trapOff(X,Y+2),T).
 
     % quand le mob se casse : plusieurs possibilités
@@ -710,7 +744,7 @@ removed(mob(X, Y+1), T) :-
 removed(mob(X, Y+1), T) :-
     do(pushMobright, T),
     fluent(at(X, Y), T),
-    fluent(spike(X,Y+2),T).    
+    spike(X,Y+2).    
     
 removed(mob(X, Y+1), T) :-
     do(pushMobright, T),
@@ -751,7 +785,7 @@ fluent(mob(X+ 2, Y ), T + 1) :-
     not fluent(mob(X+2,Y),T),
     not fluent(lock(X+2,Y),T),
     not mur(X+2,Y),
-    not fluent(spike(X+2,Y),T),
+    not spike(X+2,Y),
     not fluent(trapOff(X+2,Y),T).
 
 removed(mob(X+1, Y), T) :-
@@ -761,7 +795,7 @@ removed(mob(X+1, Y), T) :-
     not fluent(mob(X+2,Y),T),
     not fluent(lock(X+2,Y),T),
     not mur(X+2,Y),
-    not fluent(spike(X+2,Y),T),
+    not spike(X+2,Y),
     not fluent(trapOff(X+2,Y),T).
 
     % quand le mob se casse : plusieurs possibilités
@@ -788,7 +822,7 @@ removed(mob(X+1, Y), T) :-
 removed(mob(X+1, Y), T) :-
     do(pushMobdown, T),
     fluent(at(X, Y), T),
-    fluent(spike(X+2,Y),T).    
+    spike(X+2,Y).    
     
 removed(mob(X+1, Y), T) :-
     do(pushMobdown, T),
@@ -830,7 +864,7 @@ fluent(mob(X - 2, Y ), T + 1) :-
     not fluent(mob(X-2,Y),T),
     not fluent(lock(X-2,Y),T),
     not mur(X-2,Y),
-    not fluent(spike(X-2,Y),T),
+    not spike(X-2,Y),
     not fluent(trapOff(X-2,Y),T).
 
 removed(mob(X-1, Y), T) :-
@@ -840,7 +874,7 @@ removed(mob(X-1, Y), T) :-
     not fluent(mob(X-2,Y),T),
     not fluent(lock(X-2,Y),T),
     not mur(X-2,Y),
-    not fluent(spike(X-2,Y),T),
+    not spike(X-2,Y),
     not fluent(trapOff(X-2,Y),T).
 
     % quand le mob se casse : plusieurs possibilités
@@ -867,7 +901,7 @@ removed(mob(X-1, Y), T) :-
 removed(mob(X-1, Y), T) :-
     do(pushMobup, T),
     fluent(at(X, Y), T),
-    fluent(spike(X-2,Y),T).    
+    spike(X-2,Y).    
     
 removed(mob(X-1, Y), T) :-
     do(pushMobup, T),
@@ -1160,7 +1194,8 @@ removed(aCle(1), T) :-
 
     return res
 
-#Tape dans porte si pas de clé
+
+#Tape dans porte si pas de clé ou block
 def hitLock() ->str:
     res = "%%% Tape dans une porte %%%\n\n"
     res += """
@@ -1224,6 +1259,89 @@ def hitLock() ->str:
 
     return res
 
+def hitBlock() ->str:
+
+    res = "%%% Tape dans un block %%%\n\n"
+    res += """
+        %%  action left
+        % preconditions
+
+        :- do(hitBlockLeft,T),
+            fluent(at(X,Y),T),
+            not fluent(block(X,Y-1),T).
+
+        :-  do(hitBlockLeft, T),
+            fluent(at(X, Y), T),
+            fluent(block(X,Y-1), T),
+            not mur(X,Y-2),
+            not fluent(block(X,Y-2), T),
+            not fluent(mob(X,Y-1), T),
+            not fluent(lock(X,Y-2), T).
+ 
+
+        % effets
+
+
+        %%  action right
+        % preconditions
+
+        :- do(hitBlockRight,T),
+            fluent(at(X,Y),T),
+            not fluent(block(X,Y+1),T).
+
+        :-  do(hitBlockRight, T),
+            fluent(at(X, Y), T),
+            fluent(block(X,Y+1), T),
+            not mur(X,Y+2),
+            not fluent(block(X,Y+2), T),
+            not fluent(mob(X,Y+1), T),
+            not fluent(lock(X,Y+2), T).
+
+        % effets
+
+
+        %%  action down
+         % preconditions
+
+        :- do(hitBlockDown,T),
+            fluent(at(X,Y),T),
+            not fluent(block(X+1,Y),T).
+
+        :-  do(hitBlockDown, T),
+            fluent(at(X, Y), T),
+            fluent(block(X+1,Y), T),
+            not mur(X+2,Y),
+            not fluent(block(X+2,Y), T),
+            not fluent(mob(X+1,Y), T),
+            not fluent(lock(X+2,Y), T).
+
+        % effets
+
+
+        %%  action up
+      
+        % preconditions
+
+        :- do(hitBlockUp,T),
+            fluent(at(X,Y),T),
+            not fluent(block(X-1,Y),T).
+
+        :-  do(hitBlockUp, T),
+            fluent(at(X, Y), T),
+            fluent(block(X-1,Y), T),
+            not mur(X-2,Y),
+            not fluent(block(X-2,Y), T),
+            not fluent(mob(X-1,Y), T),
+            not fluent(lock(X-2,Y), T).
+
+        % effets
+
+
+        """
+
+    return res
+
+
 
 ####################################################################
 def main():
@@ -1232,6 +1350,7 @@ def main():
     res+=grid_to_environnment()
     res+=liste_actions()
     res+=grid_to_faits()
+    res+="spike(-1,-1).\n\n" #car sinon il aime pas si aucun sur la map (soit cette solution, soit utiliser des fluents)
     res+=regles_achieved()
     res+=generateur()
     res+=frame_problem()
@@ -1241,6 +1360,10 @@ def main():
     res+=takeKey()
     res+=unlock()
     res+=hitLock()
+    res+=hitBlock()
+    res+=damage()
+    res+=switchTrap() #Ca fonctionne sans ça???
+
     res+="\n#show do/2.\n"
 
     f = open("ASP_file.txt", "w")
