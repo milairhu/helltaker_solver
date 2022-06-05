@@ -9,7 +9,7 @@ from clingo.control import Control
 
 
 #########" ETAT ACTUEL : ne marche pas pour trape : on modifie Frame Problem :erreur vient de Frame Problem qui force continuité ou de switchTrap?
-
+                        #PB niveau : trap, level9
 ################## Infos sur la grille ####################
 
 
@@ -148,13 +148,13 @@ def frame_problem() ->str:
 %%% Frame Problem
 % les fluents qui n'ont pas ete supprimes restent a leur valeur, sauf les trapOn/Off
 
-removed(trapOn(X,Y),T+1) :- 
-    fluent(trapOn(X,Y),T),
-    T+1<horizon.
+%removed(trapOn(X,Y),T+1) :- 
+%    fluent(trapOn(X,Y),T),
+%    T+1<horizon.
     
-removed(trapOff(X,Y),T+1) :- 
-    fluent(trapOff(X,Y),T),
-    T+1<horizon.   
+%removed(trapOff(X,Y),T+1) :- 
+%    fluent(trapOff(X,Y),T),
+%    T+1<horizon.   
     
 
 
@@ -175,24 +175,34 @@ fluent(F, T + 1) :-
     return res
 
 
-##### Gestion des dégats : 
+##### Gestion des dégats :
 def damage()->str:
     res="""
     %%% Gestion des degats
     
 %si le mouvement precedent est != degat et que perso est sur spikes ou trapOn, il subit un tour de penalite 
 
-do(damage,T+1) :- 
+do(damage,T) :- 
     T<horizon,
-    fluent(at(X,Y),T+1),
+    fluent(at(X,Y),T),
     spike(X,Y),
-    not do(damage,T).
+    not do(damage,T-1).
 
-do(damage,T+1) :- 
+do(damage,T) :- 
     T<horizon,
-    fluent(at(X,Y),T+1),
-    fluent(trapOn(X,Y),T+1),
-    not do(damage,T).    
+    fluent(at(X,Y),T),
+    fluent(trapOn(X,Y),T),
+    not do(damage,T-1).    
+
+%et on ne subit des degats que si on est sur un piege
+not do(damage,T) :- 
+    fluent(at(X,Y),T),
+    not fluent(trapOn(X,Y),T),
+    not spike(X,Y).
+
+%pas de dégats 2* d'affilé
+:- do(damage,T), do(damage,T+1).
+
 
     """
 
@@ -200,21 +210,56 @@ do(damage,T+1) :-
 
 
 
-##### Gestion Trap On/Off : alternance sauf si dégats
+##### Gestion Trap On/Off : alternance sauf si dégats           #Erreur : piste : T et U, une fois sortis, ne rentrent plus!
 def switchTrap() ->str :
     res="""
 %%% Gestion Trap On/Off : alternance sauf si degats
 
+%%Alternance
 fluent(trapOn(X,Y),T+1):-
     fluent(trapOff(X,Y),T),
     T<horizon,
     not do(damage,T).
+    
+removed(trapOn(X, Y), T) :-
+    not do(damage, T),
+    T<horizon,
+    fluent(trapOn(X, Y), T).
  
+ removed(trapOn(X, Y), T) :-
+    do(damage, T),
+    T<horizon,
+    fluent(trapOff(X, Y), T).
+    
+    
 fluent(trapOff(X,Y),T+1):-
     fluent(trapOn(X,Y),T),
     T<horizon,
-    not do(damage,T).   
-     
+   not do(damage,T).   
+
+removed(trapOff(X,Y),T):-
+    fluent(trapOn(X,Y),T),
+    T<horizon,
+   not do(damage,T). 
+   
+removed(trapOff(X, Y), T) :-
+    do(damage, T),
+    T<horizon,
+    fluent(trapOn(X, Y), T).
+    
+    
+%%%Continuite si degats;
+
+%fluent(trapOn(X,Y),T+1):-
+ %   fluent(trapOn(X,Y),T),
+ %   T<horizon,
+ %   do(damage,T).
+ 
+%fluent(trapOff(X,Y),T+1):-
+%    fluent(trapOff(X,Y),T),
+%    T<horizon,
+%    do(damage,T). 
+   
     """
 
     return res
