@@ -184,7 +184,6 @@ def do_fn(action, state, map_rules):
             and is_free_block(X1, state)
             and is_free_mob(X1, state)
             and is_free_lock(X1, state)
-            and is_free_key(X1, state)
         ):
             newMob = [
                 x for x in list(mob_) if x not in list(trapSafe_)
@@ -193,6 +192,7 @@ def do_fn(action, state, map_rules):
                 max_steps_ -= 2
             else:
                 max_steps_ -= 1
+            if(not is_free_key(X1,state)):key_=0
             return State(
                 hero=X1,
                 block=block_,
@@ -210,15 +210,7 @@ def do_fn(action, state, map_rules):
         action.verb == "pushSoldat"
     ):  # without killing him against an object other than traps
         X2 = one_step(X1, action.direction)
-        if (
-            not is_free_mob(X1, state)
-            and is_free_wall(X2, map_rules)
-            and is_free_block(X2, state)
-            and is_free_mob(X2, state)
-            and is_free_lock(X2, state)
-            and is_free_key(X2, state)
-            and is_free_spikes(X2, map_rules)
-        ):
+        if not is_free_mob(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state)and is_free_spikes(X2, map_rules):
             newMob = list(state.mob)
             newMob.add(X2)
             newMob.remove(X1)
@@ -241,15 +233,7 @@ def do_fn(action, state, map_rules):
             return None
     if action.verb == "killMobObject":
         X2 = one_step(X1, action.direction)
-        if not is_free_mob(X1, state) and (
-            not is_free_block(X2, state)
-            or not is_free_key(X2, state)
-            or not is_free_wall(X2, map_rules)
-            or not is_free_mob(X2, state)
-            or not is_free_lock(X2, state)
-            or not is_free_spikes(X2, map_rules)
-            or not is_free_trapSafe(X2, state)
-        ):
+        if not is_free_mob(X1,state) and ( not is_free_block(X2,state) or not is_free_wall(X2,map_rules) or not is_free_mob(X2,state) or not is_free_lock(X2,state) or not is_free_spikes(X2,map_rules) or not is_free_trapSafe(X2,state)):
             newMob = list(state.mob)
             newMob.remove(X1)
             newMob = [x for x in newMob if x not in list(trapSafe_)]
