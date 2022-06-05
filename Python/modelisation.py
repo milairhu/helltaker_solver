@@ -196,7 +196,7 @@ def do_fn(action, state, map_rules):
             return State(
                 hero=X1,
                 block=block_,
-                mob=newMob,
+                mob=frozenset(newMob),
                 trapSafe=trapUnSafe_,
                 trapUnSafe=trapSafe_,
                 max_steps=max_steps_,
