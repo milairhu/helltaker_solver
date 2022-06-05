@@ -165,7 +165,7 @@ def one_step(position, direction):
 ###################################
 
 
-def do_fn(action, state, map_rules):
+def do_fn(action: Action, state: State, map_rules: Predicat):
     X0 = state.hero
     block_ = state.block
     mob_ = state.mob
@@ -178,15 +178,17 @@ def do_fn(action, state, map_rules):
     goal_ = map_rules.goal
     spikes_ = map_rules.spikes
     X1 = one_step(X0, action.direction)
+
+    ##### move hero to empty spot #####
     if action.verb == "move":
         if (
             is_free_wall(X1, map_rules)
-            and is_free_block(X1, action)
-            and is_free_mob(X1, action)
-            and is_free_lock(X1, action)
-            and is_free_key(X1, action)
-            and is_free_trapSafe(X1, action)
-            and is_free_trapUnSafe(X1, action)
+            and is_free_block(X1, state)
+            and is_free_mob(X1, state)
+            and is_free_lock(X1, state)
+            and is_free_key(X1, state)
+            and is_free_trapSafe(X1, state)
+            and is_free_trapUnSafe(X1, state)
             and is_free_spikes(X1, map_rules)
         ):
             newMob = [
@@ -205,19 +207,92 @@ def do_fn(action, state, map_rules):
             )  # swap trapsafe with trapsUnsafe
         else:
             return None
-
-    if action.verb == "push":
+    ##### push mob to empty spot #####
+    if action.verb == "pushMob":
         X2 = one_step(X1, action.direction)
-        if X1 in boxes1 and free(X2, map_rules) and not (X2 in boxes1):
-            newBox = set(boxes1)
-            newBox.add(X2)
-            newBox.remove(X1)
-            return State(boxes=frozenset(newBox), me=X1)
-            # return State(boxes={X2} | boxes1 - {X1} ,me=X1) #ce retour est faux ! apparement le type de retour ici n'est pas un State alors pas hashable
-            # alors vaut mieux prendre son temps et transformer le frozenset en set normal, faire les modifications adéquates, puis un retour simple de type State !!!!!!!!!!!!!!!!
+        if (
+            X1 in mob_
+            and is_free_wall(X2, map_rules)
+            and is_free_block(X2, state)
+            and is_free_mob(X2, state)
+            and is_free_lock(X2, state)
+            and is_free_key(X2, state)
+            and is_free_spikes(X2, map_rules)
+        ):
+            newMob = list(state.mob)
+            newMob.add(X2)
+            newMob.remove(X1)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            max_steps_ -= 1
+            return State(
+                hero=X0,
+                block=block_,
+                mob=frozenset(newMob),
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=lock_,
+                key=key_,
+            )
         else:
             return None
-    return None
+
+    ##### move hero to empty spot #####
+    if action.verb == "getKey":
+        if (
+            is_free_wall(X1, map_rules)
+            and is_free_block(X1, state)
+            and is_free_mob(X1, state)
+            and is_free_lock(X1, state)
+            and not is_free_key(X1, state)
+            and is_free_trapSafe(X1, state)
+            and is_free_trapUnSafe(X1, state)
+            and is_free_spikes(X1, map_rules)
+        ):
+            newMob = list(state.mob)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            max_steps_ -= 1
+            return State(
+                hero=X1,
+                block=block_,
+                mob=newMob,
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=lock_,
+                key=frozenset({}),
+            )  # swap trapsafe with trapsUnsafe
+        else:
+            return None
+
+    ##### move hero to empty spot #####
+    if action.verb == "openLock":
+        if (
+            is_free_wall(X1, map_rules)
+            and is_free_block(X1, state)
+            and is_free_mob(X1, state)
+            and not is_free_lock(X1, state)
+            and is_free_key(X1, state)
+            and is_free_trapSafe(X1, state)
+            and is_free_trapUnSafe(X1, state)
+            and is_free_spikes(X1, map_rules)
+            and key_ == frozenset({})  # Le joueur possède la clef
+        ):
+            newMob = list(state.mob)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            max_steps_ -= 1
+            return State(
+                hero=X1,
+                block=block_,
+                mob=newMob,
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=frozenset({}),
+                key=key_,
+            )  # swap trapsafe with trapsUnsafe
+        else:
+            return None
 
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
