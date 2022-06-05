@@ -267,6 +267,33 @@ def do_fn(action, state, map_rules):
                 lock=lock_,
                 key=key_,
             )
+    if action.verb == "openLock":
+        if (
+            is_free_wall(X1, map_rules)
+            and is_free_block(X1, state)
+            and is_free_mob(X1, state)
+            and not is_free_lock(X1, state)
+            and is_free_key(X1, state)
+            and is_free_trapSafe(X1, state)
+            and is_free_trapUnSafe(X1, state)
+            and is_free_spikes(X1, map_rules)
+            and key_ == frozenset({})  # Le joueur possède la clef
+        ):
+            newMob = list(state.mob)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            max_steps_ -= 1
+            return State(
+                hero=X1,
+                block=block_,
+                mob=newMob,
+                trapSafe=trapUnSafe_,
+                trapUnSafe=trapSafe_,
+                max_steps=max_steps_,
+                lock=frozenset({}),
+                key=key_,
+            )  # swap trapsafe with trapsUnsafe
+        else:
+            return None
 
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
