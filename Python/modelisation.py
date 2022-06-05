@@ -213,7 +213,7 @@ def do_fn(action, state, map_rules):
         X2 = one_step(X1, action.direction)
         if not is_free_mob(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state)and is_free_spikes(X2, map_rules):
             newMob = list(state.mob)
-            newMob.add(X2)
+            newMob.append(X2)
             newMob.remove(X1)
             newMob = [x for x in newMob if x not in list(trapSafe_)]
             if not is_free_trapSafe(X0, state) or not is_free_spikes(X0, map_rules):
@@ -281,7 +281,7 @@ def do_fn(action, state, map_rules):
         X2 = one_step(X1, action.direction)
         if not is_free_block(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state):
             newBlock = list(state.block)
-            newBlock.add(X2)
+            newBlock.append(X2)
             newBlock.remove(X1)
             newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
             if not is_free_trapSafe(X0, state) or not is_free_spikes(X0, map_rules):
