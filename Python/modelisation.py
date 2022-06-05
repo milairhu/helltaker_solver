@@ -164,6 +164,7 @@ def one_step(position, direction):
 ###################################
 
 def do_fn(action, state, map_rules):
+    if (state.max_steps<=0): return None
     X0 = state.hero
     block_ = state.block
     mob_ = state.mob
@@ -178,7 +179,6 @@ def do_fn(action, state, map_rules):
     #print("###################################################","X0 avant one_step est ",X0,"l'action : ",action.verb)
     X1 =one_step(X0, action.direction)
     #print("###################################################","X1 apres one_step est ",X1,type(X1),"l'action : ",action.verb)
-    if (state.max_steps<=0): return None
     if action.verb == "move":
         if (
             is_free_wall(X1, map_rules)
