@@ -2,6 +2,7 @@
 
 ## Partie Modélisation
 ### TODO
+- ajouterDemoness to wall en s0
 - ajouter toutes les actions possibles effectuables comme push, move, ...
     
     

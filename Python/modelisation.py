@@ -100,7 +100,7 @@ def init_map(filename: str):
     )
     # init de map_rules
     map_rules = Predicat(
-        goal=frozenset(demonessToGoal(tmp["demoness"], tmp["wall"])),
+        goal=frozenset(demoness_to_goal(tmp["demoness"], tmp["wall"])),
         demoness=frozenset(tmp["demoness"]),
         wall=frozenset(tmp["wall"]),
         key=frozenset(tmp["key"]),
@@ -187,14 +187,18 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
             and is_free_mob(X1, state)
             and is_free_lock(X1, state)
             and is_free_key(X1, state)
+<<<<<<< HEAD
             and is_free_trapSafe(X1, state)
             and is_free_trapUnSafe(X1, state)
             and is_free_spikes(X1, map_rules)
+=======
+>>>>>>> 2ded833b12862cf4e8a30ca0320e930af430f2d4
         ):
             newMob = [
                 x for x in list(mob_) if x not in list(trapSafe_)
             ]  # we will add it every time, basically if there is an existing mob in a spike it kills it
-            max_steps_ -= 1
+            if(not is_free_trapSafe(X1,state) or not is_free_spikes(X1,map_rules)): max_steps_ -= 2
+            else :max_steps_ -= 1 
             return State(
                 hero=X1,
                 block=block_,
@@ -223,14 +227,15 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
             newMob = list(state.mob)
 =======
 
-    if action.verb == "pushSoldat":
+    if action.verb == "pushSoldat": #without killing him against an object other than traps
         X2 = one_step(X1, action.direction)
-        if X1 in mob_ and is_free_wall(X2, map_rules)and is_free_block(X2, action)and is_free_mob(X2, action)and is_free_lock(X2, action)and is_free_key(X2, action)and is_free_spikes(X2, map_rules):
+        if not is_free_mob(X1,state) and is_free_wall(X2, map_rules)and is_free_block(X2, state)and is_free_mob(X2, state)and is_free_lock(X2, state)and is_free_key(X2, state)and is_free_spikes(X2, map_rules):
             newMob=list(state.mob)
 >>>>>>> 3fa0932194ac69aa0ea534b5a740259f1f4ff87b
             newMob.add(X2)
             newMob.remove(X1)
             newMob = [x for x in newMob if x not in list(trapSafe_)]
+<<<<<<< HEAD
             max_steps_ -= 1
 <<<<<<< HEAD
             return State(
@@ -301,11 +306,24 @@ def do_fn(action: Action, state: State, map_rules: Predicat):
                 key=key_,
             )  # swap trapsafe with trapsUnsafe
 =======
+=======
+            if(not is_free_trapSafe(X0,state) or not is_free_spikes(X0,map_rules)): max_steps_ -= 2
+            else :max_steps_ -= 1   
+>>>>>>> 2ded833b12862cf4e8a30ca0320e930af430f2d4
             return State(hero=X0,block=block_,mob=frozenset(newMob),trapSafe=trapUnSafe_,trapUnSafe=trapSafe_,max_steps=max_steps_,lock=lock_,key=key_,)
 >>>>>>> 3fa0932194ac69aa0ea534b5a740259f1f4ff87b
         else:
             return None
-
+    if action.verb=="killMobObject":
+        X2 = one_step(X1, action.direction)
+        if not is_free_mob(X1,state) and ( not is_free_block(X2,state) or not is_free_key(X2,state) or not is_free_wall(X2,map_rules) or not is_free_mob(X2,state) or not is_free_lock(X2,state) or not is_free_spikes(X2,map_rules) or not is_free_trapSafe(X2,state)):
+            newMob=list(state.mob)
+            newMob.remove(X1)
+            newMob = [x for x in newMob if x not in list(trapSafe_)]
+            if(not is_free_trapSafe(X0,state) or not is_free_spikes(X0,map_rules)): max_steps_ -= 2
+            else :max_steps_ -= 1   
+            return State(hero=X0,block=block_,mob=frozenset(newMob),trapSafe=trapUnSafe_,trapUnSafe=trapSafe_,max_steps=max_steps_,lock=lock_,key=key_,)
+    
 
 ############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
 """def succ_factory(rules) :
