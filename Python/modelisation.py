@@ -11,10 +11,7 @@ Action = namedtuple("action", ("verb", "direction"))
 actions = {
     d: frozenset({Action("move", d), Action("pushMob", d), Action("killMobObject", d),Action("openLock", d),Action("pushBlock", d),Action("tapBlock", d)})
     for d in "udrl"
-}  # actions
-
-#################################### demoness_to_goal ne pas toucher & init_map à changer potentiellement mais fonctionnel
-
+}  
 def demoness_to_goal(demonessPos: list, wallPos: list):
     goal = []
     for pair in demonessPos:
@@ -107,12 +104,6 @@ def init_map(filename: str):
     return s0, map_rules
 
 
-#################################### is_free_XXX pas terminé
-# TODO je crois que certaines sont inutiles, à la fin on pourra retirer celles qu'on n'utilise pas
-def is_free_demoness(position, map_rules):
-    return not (position in map_rules.demoness)
-
-
 def is_free_wall(position, map_rules):
     return not (position in map_rules.wall)
 
@@ -128,34 +119,22 @@ def is_free_lock(position, map_rules):
 def is_free_spikes(position, map_rules):
     return not (position in map_rules.spikes)
 
-
-def is_free_hero(position, map_rules):
-    return not (position in map_rules.hero)
-
-
 def is_free_block(position, map_rules):
     return not (position in map_rules.block)
-
 
 def is_free_mob(position, map_rules):
     return not (position in map_rules.mob)
 
-
 def is_free_trapSafe(position, map_rules):
     return not (position in map_rules.trapSafe)
-
 
 def is_free_trapUnSafe(position, map_rules):
     return not (position in map_rules.trapUnSafe)
 
 
-#################################### one_step ne pas toucher
-
 
 def one_step(position, direction):
-    #print("############################## 1",position)
     i, j = position
-    #print("############################## apres list",i,j)
     return {"r": (i, j + 1), "l": (i, j - 1), "u": (i - 1, j), "d": (i + 1, j)}[
         direction
     ]
@@ -173,13 +152,7 @@ def do_fn(action, state, map_rules):
     max_steps_ = state.max_steps
     key_ = state.key
     lock_ = state.lock
-    wall_ = map_rules.wall
-    goal_ = map_rules.goal
-    spikes_ = map_rules.spikes
-    #print("################################################# CLE",State.key)
-    #print("###################################################","X0 avant one_step est ",X0,"l'action : ",action.verb)
     X1 =one_step(X0, action.direction)
-    #print("###################################################","X1 apres one_step est ",X1,type(X1),"l'action : ",action.verb)
     if action.verb == "move":
         if (
             is_free_wall(X1, map_rules)
@@ -254,12 +227,13 @@ def do_fn(action, state, map_rules):
                 key=key_,
             )
     if action.verb == "openLock":
-        if (
+        a=state.key
+        if (    
             is_free_wall(X1, map_rules)
             and is_free_block(X1, state)
             and is_free_mob(X1, state)
             and not is_free_lock(X1, state)
-            and not State.key  # Le joueur possède la clef
+            and a==frozenset()  # Le joueur possède la clef
         ):
             newMob = [x for x in list(state.mob) if x not in list(trapSafe_)]
             if not is_free_trapSafe(X1, state) or not is_free_spikes(X1, map_rules):
@@ -322,22 +296,21 @@ def do_fn(action, state, map_rules):
         else:
             return None
 
-############################################################### cette partie est fonctionne correctement je crois, vaut mieux de ne pas la toucher mdr
+###############################################################
 """def succ_factory(rules) :
     def succ(state) :
         l = [(do_fn(a,state._asdict()),a) for a in actions]
         return {State(**x) : a for x,a in l if x}
     return succ"""
 
-
 def succ(state, actions,map_rules):
     dic = {}
     for a in actions:
         for n in actions[a]:
-            if do_fn(n, state,map_rules) != None: #à refaire on calcul Deux fois
-                dic[do_fn(n, state,map_rules)] = a
+            Temp=do_fn(n, state,map_rules)
+            if Temp != None:
+                dic[Temp] = a
     return dic
-
 
 """def goal_factory(rules) :
     def goals(state) :
@@ -348,20 +321,13 @@ def succ(state, actions,map_rules):
 def goals(state, rules):
     return (state.hero in list(rules.goal))
 
-
 def insert_tail(s, l):
     l.append(s)
     return l
-
-
 def remove_head(l):
     return l.pop(0), l
-
-
 def remove_tail(l):
     return l.pop(), l
-
-
 def dict2path(s, d):
     l = [(s, None)]
     while not d[s] is None:
@@ -371,44 +337,23 @@ def dict2path(s, d):
     l.reverse()
     return l
 
-
-########################################################### cette partie est la derniere à modifier à mon avis, on utilisera une recherche non informé pour le moment
-# dés que tout fonctionne, on peut faire une recherche informée
+##########################################################
 def search_with_parent(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     l = [s0]
     save = {s0: None}
     s = s0
     while l:
         if debug:
-            print("l =", l,'\n')
+            print("l : ",l,'\n')# suivi précis:  print("keys : ",l[0].key,"hero : ",l[0].hero,"steps left :",l[0].max_steps,'\n')
         s, l = remove(l)
-        #print(" N FOIS ####### \n")
         for s2, a in succ(s, actions,map_rules).items():
-            #print(" N FOIS ####### \n")
             if not s2 in save:
                 save[s2] = (s, a)
                 if goals(s2, map_rules):
                     return s2, save
                 insert(s2, l)
     return None, save
-
-
-"""s_end, save = search_with_parent(s0, goals, succ,remove_head, insert_tail, debug=False)
-plan = ''.join([a for s,a in dict2path(s_end,save) if a])
-print(plan)"""
-
-################################################### test
-# test map 
-s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/locknkey.txt')
-#print(s0,"\n ##########################################")
-#print(map_rules)
-#x=frozenset((1,2))
-#a,b=one_step(x,'r')
-#print(b)
-#print(s0)
-#print(map_rules)
-#print(goals(s0,map_rules))
-print(s0)
-s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=True)
+s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level2.txt')
+s_end, save = search_with_parent(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
 print(plan)
