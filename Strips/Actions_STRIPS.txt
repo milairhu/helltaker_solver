@@ -349,4 +349,4 @@ Sokoban ne permet que de pousser les caisses et de deplacer le personnage. Ici :
 - Il y a une notion de clé, qui permet qu'un "mur" n'en soit plus un.
 
 SURTOUT :
-- Le but n'est pas de disposer les caisses à un endroit précis, mais bien de mettre le personnage sur une case adjacente à la sortie (donc sur une case adjacente à la démone). 
+- Le but n'est pas de disposer les caisses à un endroit précis, mais bien de mettre le personnage sur une case adjacente à la sortie (donc sur une case adjacente à la démone, il y a donc potentiellement plusieurs sorties). 
