@@ -9,7 +9,8 @@ from clingo.control import Control
 
 
 #########" ETAT ACTUEL : ne marche pas pour trape : on modifie Frame Problem :erreur vient de Frame Problem qui force continuité ou de switchTrap?
-                        #PB niveau : trap, level9
+                        #PB : Mob meurt pas dans trap si pas poussé
+
 ################## Infos sur la grille ####################
 
 
@@ -19,7 +20,7 @@ nbCol=infosGrille["n"]
 nbLigne=infosGrille["m"]
 nbCoups=infosGrille["max_steps"] #horizon
 
-
+sequenceAction=""
 
 ###############################################################
 
@@ -32,7 +33,13 @@ class Context:
         return [x, y]
 
 def on_model(m):
+    global sequenceAction
+
+    #f=open("seq_file.txt","w")
     print (m)
+    #f.write(str(m))
+    #f.close()
+    sequenceAction=str(m)
 
 
 ##################################################
@@ -76,6 +83,7 @@ def grid_to_faits() -> str :
     res=""
 
     # Attention : U et T (et Q et P) : ça ou l'inverse?
+    #pour l'instantt : U = TrapOn et T=TrapOff
 
     for ligne in range(0,infosGrille["m"]):
         for col in range(0,infosGrille["n"]):
@@ -210,7 +218,7 @@ not do(damage,T) :-
 
 
 
-##### Gestion Trap On/Off : alternance sauf si dégats           #Erreur : piste : T et U, une fois sortis, ne rentrent plus!
+##### Gestion Trap On/Off : alternance sauf si dégats          Semble bon, cf UUU et TTT
 def switchTrap() ->str :
     res="""
 %%% Gestion Trap On/Off : alternance sauf si degats
@@ -226,10 +234,10 @@ removed(trapOn(X, Y), T) :-
     T<horizon,
     fluent(trapOn(X, Y), T).
  
- removed(trapOn(X, Y), T) :-
-    do(damage, T),
-    T<horizon,
-    fluent(trapOff(X, Y), T).
+ %removed(trapOn(X, Y), T) :- %Vraiment utile ca?
+ %   do(damage, T),
+ %   T<horizon,
+ %   fluent(trapOff(X, Y), T).
     
     
 fluent(trapOff(X,Y),T+1):-
@@ -238,16 +246,21 @@ fluent(trapOff(X,Y),T+1):-
    not do(damage,T).   
 
 removed(trapOff(X,Y),T):-
-    fluent(trapOn(X,Y),T),
+    fluent(trapOff(X,Y),T),
     T<horizon,
    not do(damage,T). 
    
-removed(trapOff(X, Y), T) :-
-    do(damage, T),
-    T<horizon,
-    fluent(trapOn(X, Y), T).
+%removed(trapOff(X, Y), T) :- %Vraiment utile?
+%    do(damage, T),
+%    T<horizon,
+%    fluent(trapOn(X, Y), T).
     
     
+    
+    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%Continuite si degats;
 
 %fluent(trapOn(X,Y),T+1):-
@@ -259,7 +272,7 @@ removed(trapOff(X, Y), T) :-
 %    fluent(trapOff(X,Y),T),
 %    T<horizon,
 %    do(damage,T). 
-   
+
     """
 
     return res
@@ -674,7 +687,7 @@ fluent(mob(X, Y - 2), T + 1) :-
     not fluent(lock(X,Y-2),T),
     not mur(X,Y-2),
     not spike(X,Y-2),
-    not fluent(trapOff(X,Y-2),T).
+    not fluent(trapOn(X,Y-2),T+1). %%ATTENTION, ce cas géré par breakmob?
 
 removed(mob(X, Y-1), T) :-
     do(pushMobleft, T),
@@ -684,7 +697,7 @@ removed(mob(X, Y-1), T) :-
     not fluent(lock(X,Y-2),T),
     not mur(X,Y-2),
     not spike(X,Y-2),
-    not fluent(trapOff(X,Y-2),T).
+    not fluent(trapOn(X,Y-2),T+1).
 
     % quand le mob se casse : plusieurs possibilités
 removed(mob(X, Y-1), T) :-
@@ -715,7 +728,7 @@ removed(mob(X, Y-1), T) :-
 removed(mob(X, Y-1), T) :-
     do(pushMobleft, T),
     fluent(at(X, Y), T),
-    fluent(trapOff(X,Y-2),T).    
+    fluent(trapOn(X,Y-2),T+1).    
     
     
 %%  push right
@@ -753,7 +766,7 @@ fluent(mob(X, Y + 2), T + 1) :-
     not fluent(lock(X,Y+2),T),
     not mur(X,Y+2),
     not spike(X,Y+2),
-    not fluent(trapOff(X,Y+2),T).
+    not fluent(trapOn(X,Y+2),T+1).
 
 removed(mob(X, Y+1), T) :-
     do(pushMobright, T),
@@ -763,7 +776,7 @@ removed(mob(X, Y+1), T) :-
     not fluent(lock(X,Y+2),T),
     not mur(X,Y+2),
     not spike(X,Y+2),
-    not fluent(trapOff(X,Y+2),T).
+    not fluent(trapOn(X,Y+2),T+1).
 
     % quand le mob se casse : plusieurs possibilités
 removed(mob(X, Y+1), T) :-
@@ -794,7 +807,7 @@ removed(mob(X, Y+1), T) :-
 removed(mob(X, Y+1), T) :-
     do(pushMobright, T),
     fluent(at(X, Y), T),
-    fluent(trapOff(X,Y+2),T).  
+    fluent(trapOn(X,Y+2),T+1).  
 
 
 %%  push down
@@ -831,7 +844,7 @@ fluent(mob(X+ 2, Y ), T + 1) :-
     not fluent(lock(X+2,Y),T),
     not mur(X+2,Y),
     not spike(X+2,Y),
-    not fluent(trapOff(X+2,Y),T).
+    not fluent(trapOn(X+2,Y),T+1).
 
 removed(mob(X+1, Y), T) :-
     do(pushMobdown, T),
@@ -841,7 +854,7 @@ removed(mob(X+1, Y), T) :-
     not fluent(lock(X+2,Y),T),
     not mur(X+2,Y),
     not spike(X+2,Y),
-    not fluent(trapOff(X+2,Y),T).
+    not fluent(trapOn(X+2,Y),T+1).
 
     % quand le mob se casse : plusieurs possibilités
 removed(mob(X+1, Y), T) :-
@@ -872,7 +885,7 @@ removed(mob(X+1, Y), T) :-
 removed(mob(X+1, Y), T) :-
     do(pushMobdown, T),
     fluent(at(X, Y), T),
-    fluent(trapOff(X+2,Y),T).  
+    fluent(trapOn(X+2,Y),T+1).  
 
 
 
@@ -910,7 +923,7 @@ fluent(mob(X - 2, Y ), T + 1) :-
     not fluent(lock(X-2,Y),T),
     not mur(X-2,Y),
     not spike(X-2,Y),
-    not fluent(trapOff(X-2,Y),T).
+    not fluent(trapOn(X-2,Y),T+1).
 
 removed(mob(X-1, Y), T) :-
     do(pushMobup, T),
@@ -920,7 +933,7 @@ removed(mob(X-1, Y), T) :-
     not fluent(lock(X-2,Y),T),
     not mur(X-2,Y),
     not spike(X-2,Y),
-    not fluent(trapOff(X-2,Y),T).
+    not fluent(trapOn(X-2,Y),T+1).
 
     % quand le mob se casse : plusieurs possibilités
 removed(mob(X-1, Y), T) :-
@@ -951,12 +964,36 @@ removed(mob(X-1, Y), T) :-
 removed(mob(X-1, Y), T) :-
     do(pushMobup, T),
     fluent(at(X, Y), T),
-    fluent(trapOff(X-2,Y),T).  
+    fluent(trapOn(X-2,Y),T+1).  
 
 
 """
 
     return res
+
+def breakMob() ->str:
+
+    res="""
+    removed(mob(X,Y),T):-
+        fluent(mob(X,Y),T),
+        not do(pushMobleft,T),
+        not do(pushMobright,T),
+        not do(pushMobup,T),
+        not do(pushMobdown,T),
+        spike(X,Y).
+        
+    removed(mob(X,Y),T):-
+        fluent(mob(X,Y),T),
+        not do(pushMobleft,T),
+        not do(pushMobright,T),
+        not do(pushMobup,T),
+        not do(pushMobdown,T),
+        fluent(trapOn(X,Y),T).
+    
+
+    """
+    return res
+
 
 
 #la cle ne peut être que sur une case sans rien dessus? On prevoit quand meme si soldat ou block...
@@ -1389,7 +1426,54 @@ def hitBlock() ->str:
 
 
 ####################################################################
+
+def plan(sequence)->str:
+
+
+    tab=sequence.split()
+    res = {}
+
+    for mouv in tab:
+        tabMouv=mouv.split(",")
+
+        #on prend le numero de l'action (car retour pas toujours dans l'ordre
+        numAction=""
+        i=0
+        e=tabMouv[1][i]
+        while e in ['0','1','2','3','4','5','6','7','8','9']:
+            numAction+=e
+            i+=1
+            e = tabMouv[1][i]
+
+        intNumAction=int(numAction)
+
+        #on prend l'action
+        action=tabMouv[0].split("(")[1]
+
+        if action in ["left",    "pushleft",    "pushMobleft" ,    "takeKeyLeft",   "unlockLeft",    "hitLockLeft",    "hitBlockLeft"]:
+            res[intNumAction]="G"
+        elif action in ["right",    "pushright",    "pushMobright" ,    "takeKeyRight",   "unlockRight",    "hitLockRight",    "hitBlockRight"]:
+            res[intNumAction]="D"
+        elif action in ["up",    "pushup",    "pushMobup" ,    "takeKeyUp",   "unlockUp",    "hitLockUp",    "hitBlockUp"]:
+            res[intNumAction]="H"
+        elif action in ["down",    "pushdown",    "pushMobdown" ,    "takeKeyDown",   "unlockDown",    "hitLockDown",    "hitBlockDown"]:
+            res[intNumAction]="B"
+        else:
+            res[intNumAction]="N"
+
+
+    seq=""
+    for i in range(0,len(tab)):
+        if res[i]!='N':
+            seq+=res[i]
+
+    return seq
+
+
+####################################################################
 def main():
+
+    global sequenceAction
 
     res=""
     res+=grid_to_environnment()
@@ -1408,7 +1492,7 @@ def main():
     res+=hitBlock()
     res+=damage()
     res+=switchTrap() #Ca fonctionne sans ça???
-
+    res+=breakMob()
     res+="\n#show do/2.\n"
 
     f = open("ASP_file.txt", "w")
@@ -1418,8 +1502,10 @@ def main():
     ctl = Control()
     ctl.add("base", [],res)
     ctl.ground([("base", [])], context=Context())
-    ctl.solve()
-    print(ctl.solve(on_model=on_model))
+    #ctl.solve()
+    print(ctl.solve(on_model=on_model))#renvoie que SAT ou UNSAT
+
+    print(plan(sequenceAction))
 
 
 
