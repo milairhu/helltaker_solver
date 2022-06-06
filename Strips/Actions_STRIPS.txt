@@ -20,19 +20,19 @@ Déplacement simple :
 
 Action(MouvD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ ¬block(x,y') ∧ ¬mur(x,y') ∧ ¬soldat(x,y') ∧ ¬porte(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y))
+EFFECT : perso(x,y') ∧ ¬perso(x,y))
 
 Action(MouvG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ ¬block(x,y') ∧ ¬mur(x,y') ∧ ¬soldat(x,y') ∧ ¬porte(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y))
+EFFECT : perso(x,y') ∧ ¬perso(x,y))
 
 Action(MouvH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ ¬block(x',y) ∧ ¬mur(x',y) ∧ ¬soldat(x',y) ∧ ¬porte(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y))
+EFFECT : perso(x',y) ∧ ¬perso(x,y))
 
 Action(MouvB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ ¬block(x',y) ∧ ¬mur(x',y) ∧ ¬soldat(x',y) ∧ ¬porte(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y))
+EFFECT : perso(x',y) ∧ ¬perso(x,y))
 
 --------------------------------------------------------------------------------------------------------
 
@@ -208,19 +208,19 @@ Obtenir une Clé :
 
 Action(ObtenirCléD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y') ∧ ¬aClé
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
+EFFECT : perso(x,y') ∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ clé(x,y') ∧ ¬block(x,y') ∧ ¬soldat(x,y') ∧ ¬aClé
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
+EFFECT : perso(x,y') ∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ clé(x',y)∧ ¬block(x',y) ∧ ¬soldat(x',y) ∧ ¬aClé
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧¬clé(x,y') ∧ aClé)
+EFFECT : perso(x',y) ∧ ¬perso(x,y) ∧¬clé(x,y') ∧ aClé)
 
 Action(ObtenirCléB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ clé(x',y) ∧ ¬block(x',y) ∧ ¬soldat(x',y) ∧ ¬aClé
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
+EFFECT : perso(x',y) ∧ ¬perso(x,y) ∧ ¬clé(x,y') ∧ aClé)
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -228,19 +228,19 @@ Ouvrir une Porte avec la clé : aClé est littéral qui dit si on a une clé ou 
 
 Action(OuvrirPorteD(x,y),
 PRECOND: perso(x,y) ∧ inc(y,y') ∧ aClé ∧ porte(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
+EFFECT : perso(x,y') ∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
 
 Action(OuvrirPorteG(x,y),
 PRECOND: perso(x,y) ∧ inc(y',y) ∧ aClé ∧ porte(x,y')
-EFFECT : perso(x,y')∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
+EFFECT : perso(x,y') ∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x,y'))
 
 Action(OuvrirPorteH(x,y),
 PRECOND: perso(x,y) ∧ inc(x',x) ∧ aClé ∧ porte(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
+EFFECT : perso(x',y) ∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
 
 Action(OuvrirPorteB(x,y),
 PRECOND: perso(x,y) ∧ inc(x,x') ∧ aClé ∧ porte(x',y)
-EFFECT : perso(x',y)∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
+EFFECT : perso(x',y) ∧ ¬perso(x,y) ∧ ¬aClé ∧ ¬porte(x',y))
 
 ---------------------------------------------------------------------------------------------------------------
 
