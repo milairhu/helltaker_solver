@@ -1,4 +1,5 @@
 from collections import namedtuple
+from turtle import distance
 from helltaker_utils import grid_from_file
 import time
 
@@ -12,7 +13,7 @@ Action = namedtuple("action", ("verb", "direction"))
 actions = {
     d: frozenset({Action("move", d), Action("pushMob", d), Action("killMobObject", d),Action("openLock", d),Action("pushBlock", d),Action("tapBlock", d)})
     for d in "udrl"
-}  
+} 
 def demoness_to_goal(demonessPos: list, wallPos: list):
     goal = []
     for pair in demonessPos:
@@ -345,7 +346,7 @@ def BFS(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     s = s0
     while l:
         if debug:
-            print("l : ",l,'\n')# suivi précis:  print("keys : ",l[0].key,"hero : ",l[0].hero,"steps left :",l[0].max_steps,'\n')
+            print("l : ",l,'\n')
         s, l = remove(l)
         for s2, a in succ(s, actions,map_rules).items():
             if not s2 in save:
@@ -362,7 +363,7 @@ def DFS(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     s = s0
     while l:
         if debug:
-            print("l : ",l,'\n')# suivi précis:  print("keys : ",l[0].key,"hero : ",l[0].hero,"steps left :",l[0].max_steps,'\n')
+            print("l : ",l,'\n')
         s, l = remove(l)
         for s2, a in succ(s, actions,map_rules).items():
             if not s2 in save:
@@ -394,7 +395,6 @@ def Astar(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
     while l:
         if debug:
             print("l : ",l,'\n')
-            #print("keys : ",l[0][0].key,"hero : ",l[0][0].hero,"steps left :",l[0][0].max_steps," heuristique",l[0][1],'\n')
         l.sort(key=lambda x:x[1])
         s, l = remove(l)
         for s2, a in succ(s[0], actions,map_rules).items():
@@ -405,20 +405,73 @@ def Astar(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
                 insert((s2,distManhattan(s2.hero,nearestGoal(s2.hero,map_rules))+ s[1] - distManhattan(s[0].hero,nearestGoal(s[0].hero,map_rules))+1),l)
     return None, save
 
+################################################################################################
+def AstarModified(s0,actions,map_rules, goals, succ, remove, insert, debug=True):
+    if(s0.key!=frozenset()):
+        l = [(s0,distManhattan(s0.hero,list(s0.key)[0])+distManhattan(s0.hero,nearestGoal(s0.hero,map_rules)))]
+    else:
+        l = [(s0,distManhattan(s0.hero,nearestGoal(s0.hero,map_rules)))]
+    save = {s0: None}
+    s = s0
+    while l:
+        if debug:
+            print("l : ",l,'\n')
+        l.sort(key=lambda x:x[1])
+        s, l = remove(l)
+        distance_actuel=s[1] - distManhattan(s[0].hero,nearestGoal(s[0].hero,map_rules))
+        for s2, a in succ(s[0], actions,map_rules).items():
+            if not s2 in save:
+                save[s2] = (s[0], a)
+                if goals(s2, map_rules):
+                    return s2, save
+                if (s2.key!=frozenset()):
+                    insert((s2,distManhattan(s2.hero,list(s2.key)[0])+distManhattan(s2.hero,nearestGoal(s2.hero,map_rules))+ distance_actuel +1),l)
+                else:    
+                    insert((s2,distManhattan(s2.hero,nearestGoal(s2.hero,map_rules))+ distance_actuel+1),l)
+    return None, save
+###########################################################################################################
+def GloutonModified(s,actions,map_rules, goals, succ, remove, insert, debug=True):
+    if(s0.key!=frozenset()):
+        l = [(s0,distManhattan(s0.hero,list(s0.key)[0]))]
+    else:
+        l = [(s0,distManhattan(s0.hero,nearestGoal(s0.hero,map_rules)))]
+    save = {s: None}
+    s = s0
+    while l:
+        if debug:
+            print("l : ",l,'\n')
+        l.sort(key=lambda x:x[1])
+        s, l = remove(l)
+        for s2, a in succ(s[0], actions,map_rules).items():
+            if not s2 in save:
+                save[s2] = (s[0], a)
+                if goals(s2, map_rules):
+                    return s2, save
+                if (s2.key!=frozenset()):
+                    insert((s2,distManhattan(s2.hero,list(s2.key)[0])+15),l)
+                else:    
+                    insert((s2,distManhattan(s2.hero,nearestGoal(s2.hero,map_rules))),l)
+    return None, save
+####################################################################################################
 
-
-####################################################################################################""
 t0 = time.time()
-s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level1.txt')
+s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level8.txt')    # to change
 
+#distManhattan((s0.key),s0.hero)
 #s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
-s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
+#s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
 #s_end, save = Astar(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
+#s_end, save = AstarModified(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
 
+s_end, save = GloutonModified(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
-
 t1 = time.time()
 total = t1-t0
+print(plan,"GloutonMod  -> Execution time : ",total)
+
+
 #print(plan,"Breadth-First Search -> Execution time : ",total)
-print(plan,"Depth First Search -> Execution time : ",total)
-#print(plan,"A* -> Execution time : ",total)
+#print(plan,"Depth First Search -> Execution time : ",total)
+#print(plan,"A*  -> Execution time : ",total)
+#print(plan,"A*Mod  -> Execution time : ",total)
+#print(plan,"A* Modified -> Execution time : ",total)
