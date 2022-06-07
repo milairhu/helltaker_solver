@@ -342,11 +342,13 @@ DIFFERENCES AVEC SOKOBAN :
 
 Sokoban ne permet que de pousser les caisses et de deplacer le personnage. Ici :
 
+- Chaque action a un coût, et un labyrinthe doit être résolu en un nombre fini d’actions.
 - Pousser une "caisse" coûte une action à part entière. Le personnage n'avance pas.
-- On peut casser un certain type de caisse, les "soldats", en les poussant contre des objets fixes.
-- Certaines cases sont parfois piégées, parfois non. Cela se fait indépendamment de la décision du joueur !
-- Un bloc peut être sur un piège
-- Il y a une notion de clé, qui permet qu'un "mur" n'en soit plus un.
+- On peut casser un certain type de caisse, les "soldats" (ou mobs), en les poussant contre des objets ou des murs.
+- Certaines cases sont piégées, et font perdre une action au joueur.
+- Il y a une notion de clé, qui permet de faire disparaître une sorte de mur, les portes.
+
+
 
 SURTOUT :
 - Le but n'est pas de disposer les caisses à un endroit précis, mais bien de mettre le personnage sur une case adjacente à la sortie (donc sur une case adjacente à la démone, il y a donc potentiellement plusieurs sorties). 
