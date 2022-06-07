@@ -9,7 +9,9 @@ from clingo.control import Control
 
 
 #########" ETAT ACTUEL : ne marche pas pour trape : on modifie Frame Problem :erreur vient de Frame Problem qui force continuité ou de switchTrap?
-                        #PB : Mob meurt pas dans trap si pas poussé
+                        #PB : Pk perso fait left(up) quand il vient de pousser mob dans T, et que switch est activé? (pas dans U) =>Vient de breakMob
+                        #Est ce que peu importe si je pousse dans T ou U, il est plus la apres?
+
 
 ################## Infos sur la grille ####################
 
@@ -458,6 +460,10 @@ def pushBlock() -> str:
     
 :-  do(pushleft, T),
     fluent(at(X, Y), T),
+    fluent(block(X, Y - 2), T).
+    
+:-  do(pushleft, T),
+    fluent(at(X, Y), T),
     not cell(X, Y -2).
     
 :-  do(pushleft, T),
@@ -472,13 +478,6 @@ def pushBlock() -> str:
     fluent(at(X, Y), T),
     fluent(lock(X, Y - 2), T).
 
-:-  do(pushleft, T),
-    fluent(at(X, Y), T),
-    fluent(key(X, Y - 2), T).
-
-:-  do(pushleft, T),
-    fluent(at(X, Y), T),
-    fluent(block(X , Y - 2), T).
 
 :-  do(pushleft, T),
     fluent(at(X, Y), T),
@@ -520,10 +519,7 @@ removed(block(X, Y-1), T) :-
 :-  do(pushright, T),
     fluent(at(X, Y), T),
     fluent(lock(X, Y + 2), T).
-
-:-  do(pushright, T),
-    fluent(at(X, Y), T),
-    fluent(key(X, Y + 2), T).
+    
 
 :-  do(pushright, T),
     fluent(at(X, Y), T),
@@ -572,9 +568,6 @@ removed(block(X, Y+1), T) :-
     fluent(at(X, Y), T),
     fluent(lock(X+ 2, Y ), T).
 
-:-  do(pushdown, T),
-    fluent(at(X, Y), T),
-    fluent(key(X+ 2, Y ), T).
     
 :-  do(pushdown, T),
     fluent(at(X, Y), T),
@@ -623,9 +616,6 @@ removed(block(X+1, Y), T) :-
     fluent(at(X, Y), T),
     fluent(lock(X - 2, Y ), T).
 
-:-  do(pushup, T),
-    fluent(at(X, Y), T),
-    fluent(key(X - 2, Y ), T).
 
 :-  do(pushup, T),
     fluent(at(X, Y), T),
@@ -667,9 +657,6 @@ def pushMob() -> str:
     fluent(at(X, Y), T),
     not cell(X, Y -2).
 
-:-  do(pushMobleft, T),
-    fluent(at(X, Y), T),
-    fluent(key(X, Y - 2), T).
 
 :-  do(pushMobleft, T),
     fluent(at(X, Y), T),
@@ -745,9 +732,6 @@ removed(mob(X, Y-1), T) :-
     fluent(at(X, Y), T),
     not cell(X, Y + 2).
 
-:-  do(pushMobright, T),
-    fluent(at(X, Y), T),
-    fluent(key(X, Y + 2), T).
 
 :-  do(pushMobright, T),
     fluent(at(X, Y), T),
@@ -824,9 +808,7 @@ removed(mob(X, Y+1), T) :-
     fluent(at(X, Y), T),
     not cell(X+ 2, Y ).
 
-:-  do(pushMobdown, T),
-    fluent(at(X, Y), T),
-    fluent(key(X + 2, Y), T).
+
 
 :-  do(pushMobdown, T),
     fluent(at(X, Y), T),
@@ -882,10 +864,10 @@ removed(mob(X+1, Y), T) :-
     fluent(at(X, Y), T),
     spike(X+2,Y).    
     
-removed(mob(X+1, Y), T) :-
-    do(pushMobdown, T),
+removed(mob(X+1, Y), T) :- %%laisser ça dans breakMob?
+   do(pushMobdown, T),
     fluent(at(X, Y), T),
-    fluent(trapOn(X+2,Y),T+1).  
+   fluent(trapOff(X+2,Y),T).  
 
 
 
@@ -903,9 +885,6 @@ removed(mob(X+1, Y), T) :-
     fluent(at(X, Y), T),
     not cell(X- 2, Y ).
 
-:-  do(pushMobup, T),
-    fluent(at(X, Y), T),
-    fluent(key(X - 2, Y), T).
 
 :-  do(pushMobup, T),
     fluent(at(X, Y), T),
@@ -972,23 +951,24 @@ removed(mob(X-1, Y), T) :-
     return res
 
 def breakMob() ->str:
-
-    res="""
+    res=""
+    res+="""
+    
     removed(mob(X,Y),T):-
         fluent(mob(X,Y),T),
-        not do(pushMobleft,T),
-        not do(pushMobright,T),
-        not do(pushMobup,T),
-        not do(pushMobdown,T),
+        %not do(pushMobleft,T),
+        %not do(pushMobright,T),
+        %not do(pushMobup,T),
+        %not do(pushMobdown,T),
         spike(X,Y).
         
     removed(mob(X,Y),T):-
         fluent(mob(X,Y),T),
-        not do(pushMobleft,T),
-        not do(pushMobright,T),
-        not do(pushMobup,T),
-        not do(pushMobdown,T),
-        fluent(trapOn(X,Y),T).
+        %not do(pushMobleft,T),
+        %not do(pushMobright,T),
+        %not do(pushMobup,T),
+        %not do(pushMobdown,T),
+        fluent(trapOff(X,Y),T).
     
 
     """
