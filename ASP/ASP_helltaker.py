@@ -1,16 +1,7 @@
-#from typing import List, Tuple
-#import itertools
-#import subprocess
 import sys
-from helltaker_utils import grid_from_file, check_plan
+from helltaker_utils import grid_from_file
 from clingo.symbol import Number
 from clingo.control import Control
-
-
-
-#########" ETAT ACTUEL : ne marche pas pour trape : on modifie Frame Problem :erreur vient de Frame Problem qui force continuité ou de switchTrap?
-                        #PB : Pk perso fait left(up) quand il vient de pousser mob dans T, et que switch est activé? (pas dans U) =>Vient de breakMob
-                        #Est ce que peu importe si je pousse dans T ou U, il est plus la apres?
 
 
 ################## Infos sur la grille ####################
@@ -37,10 +28,6 @@ class Context:
 def on_model(m):
     global sequenceAction
 
-    #f=open("seq_file.txt","w")
-    print (m)
-    #f.write(str(m))
-    #f.close()
     sequenceAction=str(m)
 
 
@@ -84,8 +71,7 @@ def grid_to_faits() -> str :
     global infosGrille
     res=""
 
-    # Attention : U et T (et Q et P) : ça ou l'inverse?
-    #pour l'instantt : U = TrapOn et T=TrapOff
+
 
     for ligne in range(0,infosGrille["m"]):
         for col in range(0,infosGrille["n"]):
@@ -220,7 +206,7 @@ not do(damage,T) :-
 
 
 
-##### Gestion Trap On/Off : alternance sauf si dégats          Semble bon, cf UUU et TTT
+##### Gestion Trap On/Off : alternance sauf si dégats
 def switchTrap() ->str :
     res="""
 %%% Gestion Trap On/Off : alternance sauf si degats
@@ -976,7 +962,7 @@ def breakMob() ->str:
 
 
 
-#la cle ne peut être que sur une case sans rien dessus? On prevoit quand meme si soldat ou block...
+
 
 def takeKey() -> str:
     res = "%%% Take the key (max. 1 on the map) %%%\n\n"
@@ -1482,19 +1468,15 @@ def main():
     res+=hitLock()
     res+=hitBlock()
     res+=damage()
-    res+=switchTrap() #Ca fonctionne sans ça???
+    res+=switchTrap()
     res+=breakMob()
     res+="\n#show do/2.\n"
-
-    f = open("ASP_file.txt", "w")
-    f.write(res)
-    f.close()
 
     ctl = Control()
     ctl.add("base", [],res)
     ctl.ground([("base", [])], context=Context())
-    #ctl.solve()
-    print(ctl.solve(on_model=on_model))#renvoie que SAT ou UNSAT
+
+    ctl.solve(on_model=on_model)
 
     print(plan(sequenceAction))
 
