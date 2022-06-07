@@ -1428,13 +1428,13 @@ def plan(sequence)->str:
         action=tabMouv[0].split("(")[1]
 
         if action in ["left",    "pushleft",    "pushMobleft" ,    "takeKeyLeft",   "unlockLeft",    "hitLockLeft",    "hitBlockLeft"]:
-            res[intNumAction]="G"
+            res[intNumAction]="g"
         elif action in ["right",    "pushright",    "pushMobright" ,    "takeKeyRight",   "unlockRight",    "hitLockRight",    "hitBlockRight"]:
-            res[intNumAction]="D"
+            res[intNumAction]="d"
         elif action in ["up",    "pushup",    "pushMobup" ,    "takeKeyUp",   "unlockUp",    "hitLockUp",    "hitBlockUp"]:
-            res[intNumAction]="H"
+            res[intNumAction]="h"
         elif action in ["down",    "pushdown",    "pushMobdown" ,    "takeKeyDown",   "unlockDown",    "hitLockDown",    "hitBlockDown"]:
-            res[intNumAction]="B"
+            res[intNumAction]="b"
         else:
             res[intNumAction]="N"
 
