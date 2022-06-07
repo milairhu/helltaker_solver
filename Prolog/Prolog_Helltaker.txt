@@ -1,4 +1,3 @@
-
 %mur(...).
 %mur(...).
 %piegeFixe(...).
@@ -7,7 +6,7 @@
 %case(...).
 
 %% dans state, NbCles indique le nombre de clé possédé.
-%%	   On suppose qu'il peut y avoir plusieurs clés et plusieurs portes. (Pas dans le jeu de base).
+%%	   Ici, on suppose qu'il peut y avoir plusieurs clés et plusieurs portes. (Pas dans le jeu de base).
 
 %%%% Utilitaires : %%%%
 
@@ -277,14 +276,14 @@ do(	action(tapeBlockAvecDegat, Dir),
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de toutes les actions %%%%%%%%%%%%%%%%%%%%%%%
 
-%% Remarque :  on aurait peut etre du laisser le main gérer les dégats, pour économiser du code.
+%% Remarque :  on aurait pu laisser le main gérer les dégats, pour économiser du code.
 
-%La suite est juste un copié collé de mon TD, a verifier quand on implémentera vraiment un labyrinthe.
-%Comment faire aparaitre le chrono?
 
 initial(state(me(4,2),...)).
-final(state(me(1,1),...)). %autant d'etat final que de case adjacente au demon.
+final(state(me(1,1),...)). %autant d'etats finaux que de cases adjacentes au demon.
 final(state(me(1,5),...)).
+
+%Verification du plan, à adapter.
 
 planValide([],[_],0).
 planValide([A|AT],[S1, S2|ST],N) :-
