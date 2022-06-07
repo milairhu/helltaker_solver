@@ -111,7 +111,7 @@ def grid_to_faits() -> str :
                 res+="init(trapOn("+str(ligne)+", "+str(col)+")).\n"
             elif infosGrille["grid"][ligne][col] == "O" : #cas Block ET PiegeFixe
                 res+="init(block("+str(ligne)+", "+str(col)+")).\n"
-                res += "init(spike(" + str(ligne)+", "+str(col) + ")).\n"
+                res += "spike(" + str(ligne)+", "+str(col) + ").\n"
             elif infosGrille["grid"][ligne][col] == "P" : #cas Block ET PiegePasFixeAttente
                 res+="init(block("+str(ligne)+", "+str(col)+")).\n"
                 res += "init(trapOff(" + str(ligne)+", "+str(col)+ ")).\n"
@@ -1169,6 +1169,9 @@ removed(lock(X,Y-1),T) :-
 removed(aCle(1), T) :-
     do(unlockLeft, T).
 
+removed(at(X,Y), T) :-
+    fluent(at(X,Y),T),
+    do(unlockLeft, T).
 
 %%  action right
 % preconditions
@@ -1196,7 +1199,10 @@ removed(lock(X,Y+1),T) :-
 removed(aCle(1), T) :-
     do(unlockRight, T).
 
-
+removed(at(X,Y), T) :-
+    fluent(at(X,Y),T),
+    do(unlockRight, T).
+    
 %%  action up
 % preconditions
 
@@ -1223,7 +1229,9 @@ removed(lock(X-1,Y),T) :-
 removed(aCle(1), T) :-
     do(unlockUp, T).
 
-
+removed(at(X,Y), T) :-
+    fluent(at(X,Y),T),
+    do(unlockUp, T).
 
 %%  action down
 % preconditions
@@ -1251,6 +1259,9 @@ removed(lock(X+1,Y),T) :-
 removed(aCle(1), T) :-
     do(unlockDown, T).
 
+removed(at(X,Y), T) :-
+    fluent(at(X,Y),T),
+    do(unlockDown, T).
 
 """
 
