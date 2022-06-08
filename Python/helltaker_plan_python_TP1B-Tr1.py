@@ -556,8 +556,6 @@ def GloutonModified(s, actions, map_rules, goals, succ, remove, insert, debug=Tr
 
 if __name__ == "__main__":
     s0, map_rules = init_map(sys.argv[1])
-
-    # distManhattan((s0.key),s0.hero)
     # s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
     # s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
     # s_end, save = Astar(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
@@ -568,8 +566,8 @@ if __name__ == "__main__":
     )
     plan = "".join([a for s, a in dict2path(s_end, save) if a])
     print(plan)
-    # print(plan,"Breadth-First Search -> Execution time : ",total)
-    # print(plan,"Depth First Search -> Execution time : ",total)
-    # print(plan,"A*  -> Execution time : ",total)
-    # print(plan,"A*Mod  -> Execution time : ",total)
-    # print(plan,"A* Modified -> Execution time : ",total)
+    # print(plan,"Breadth-First Search ")
+    # print(plan,"Depth First Search")
+    # print(plan,"A* ")
+    # print(plan,"A*Mod ")
+    # print(plan,"A* Modified ")
