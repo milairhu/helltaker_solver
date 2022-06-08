@@ -516,7 +516,7 @@ def GloutonModified(s, actions, map_rules, goals, succ, remove, insert, debug=Tr
         l = [(s0, distManhattan(s0.hero, list(s0.key)[0]))]
     else:
         l = [(s0, distManhattan(s0.hero, nearestGoal(s0.hero, map_rules)))]
-    save = {s: None}
+    save = {s0: None}
     s = s0
     while l:
         if debug:
