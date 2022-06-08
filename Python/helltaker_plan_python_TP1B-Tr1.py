@@ -540,7 +540,7 @@ def GloutonModified(s, actions, map_rules, goals, succ, remove, insert, debug=Tr
 
 ################################################################################################
 
-if __name__ == "__main__":
+def main():
     s0, map_rules = init_map(sys.argv[1])
     # s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
     # s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
@@ -557,3 +557,6 @@ if __name__ == "__main__":
     # print(plan,"A* ")
     # print(plan,"A*Mod ")
     # print(plan,"A* Modified ")
+
+if __name__ == "__main__":
+    main()
