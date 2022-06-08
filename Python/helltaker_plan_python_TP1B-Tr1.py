@@ -21,7 +21,7 @@ actions = {
             Action("tapBlock", d),
         }
     )
-    for d in "udrl"
+    for d in "hbdg"
 }
 
 
@@ -150,7 +150,7 @@ def is_free_trapUnSafe(position, map_rules):
 
 def one_step(position, direction):
     i, j = position
-    return {"r": (i, j + 1), "l": (i, j - 1), "u": (i - 1, j), "d": (i + 1, j)}[
+    return {"d": (i, j + 1), "g": (i, j - 1), "h": (i - 1, j), "b": (i + 1, j)}[
         direction
     ]
 
@@ -350,6 +350,7 @@ def succ(state, actions, map_rules):
                 dic[Temp] = a
     return dic
 
+
 def goals(state, rules):
     return state.hero in list(rules.goal)
 
@@ -536,8 +537,8 @@ def GloutonModified(s0, actions, map_rules, goals, succ, remove, insert, debug=T
     return None, save
 
 
-
 ################################################################################################
+
 
 def monsuperplanificateur(infos):
     s0, map_rules = init_map(infos)
