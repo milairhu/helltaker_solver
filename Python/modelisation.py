@@ -2,6 +2,7 @@ from collections import namedtuple
 from turtle import distance
 from helltaker_utils import grid_from_file
 import time
+import sys
 
 State = namedtuple(
     "State",
@@ -454,8 +455,9 @@ def GloutonModified(s,actions,map_rules, goals, succ, remove, insert, debug=True
     return None, save
 ####################################################################################################
 
-t0 = time.time()
-s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level8.txt')    # to change
+
+#s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level8.txt')    # to change
+s0, map_rules=init_map(sys.argv[1])    # to change
 
 #distManhattan((s0.key),s0.hero)
 #s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
@@ -465,9 +467,7 @@ s0, map_rules=init_map('C:/Users/erraz/OneDrive/Bureau/projet IA02/Tests/level8.
 
 s_end, save = GloutonModified(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
 plan = ''.join([a for s,a in dict2path(s_end,save) if a])
-t1 = time.time()
-total = t1-t0
-print(plan,"GloutonMod  -> Execution time : ",total)
+print(plan)
 
 
 #print(plan,"Breadth-First Search -> Execution time : ",total)
