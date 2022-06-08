@@ -342,13 +342,6 @@ def do_fn(action, state, map_rules):
 
 
 ###############################################################
-"""def succ_factory(rules) :
-    def succ(state) :
-        l = [(do_fn(a,state._asdict()),a) for a in actions]
-        return {State(**x) : a for x,a in l if x}
-    return succ"""
-
-
 def succ(state, actions, map_rules):
     dic = {}
     for a in actions:
@@ -357,13 +350,6 @@ def succ(state, actions, map_rules):
             if Temp != None:
                 dic[Temp] = a
     return dic
-
-
-"""def goal_factory(rules) :
-    def goals(state) :
-        return state.boxes == rules['goals']
-    return goals"""
-
 
 def goals(state, rules):
     return state.hero in list(rules.goal)
