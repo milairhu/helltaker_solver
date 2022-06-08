@@ -1,5 +1,5 @@
 from collections import namedtuple
-from helltaker_utils import grid_from_file
+from helltaker_utils import grid_from_file, check_plan
 import time
 import sys
 
@@ -39,8 +39,7 @@ def demoness_to_goal(demonessPos: list, wallPos: list):
     return goal
 
 
-def init_map(filename: str):
-    dic = grid_from_file(filename)
+def init_map(dic):
     tmp = {}  # dictionnaire temporaire qui sera inséré dans les types immutables
     i = 0  # coordonnées
     j = 0  # coordonnées
@@ -511,7 +510,7 @@ def AstarModified(s0, actions, map_rules, goals, succ, remove, insert, debug=Tru
 
 
 ###########################################################################################################
-def GloutonModified(s, actions, map_rules, goals, succ, remove, insert, debug=True):
+def GloutonModified(s0, actions, map_rules, goals, succ, remove, insert, debug=True):
     if s0.key != frozenset():
         l = [(s0, distManhattan(s0.hero, list(s0.key)[0]))]
     else:
@@ -540,8 +539,8 @@ def GloutonModified(s, actions, map_rules, goals, succ, remove, insert, debug=Tr
 
 ################################################################################################
 
-def main():
-    s0, map_rules = init_map(sys.argv[1])
+def monsuperplanificateur(infos):
+    s0, map_rules = init_map(infos)
     # s_end, save = BFS(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
     # s_end, save = DFS(s0,actions,map_rules, goals, succ, remove_tail, insert_tail, debug=False)
     # s_end, save = Astar(s0,actions,map_rules, goals, succ, remove_head, insert_tail, debug=False)
@@ -551,12 +550,31 @@ def main():
         s0, actions, map_rules, goals, succ, remove_head, insert_tail, debug=False
     )
     plan = "".join([a for s, a in dict2path(s_end, save) if a])
-    print(plan)
     # print(plan,"Breadth-First Search ")
     # print(plan,"Depth First Search")
     # print(plan,"A* ")
     # print(plan,"A*Mod ")
     # print(plan,"A* Modified ")
+    return plan
+
+
+def main():
+    # récupération du nom du fichier depuis la ligne de commande
+    filename = sys.argv[1]
+
+    # récupération de al grille et de toutes les infos
+    infos = grid_from_file(filename)
+
+    # calcul du plan
+    plan = monsuperplanificateur(infos)
+
+    # affichage du résultat
+    if check_plan(plan):
+        print("[OK]", plan)
+    else:
+        print("[Err]", plan, file=sys.stderr)
+        sys.exit(2)
+
 
 if __name__ == "__main__":
     main()
