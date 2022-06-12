@@ -65,35 +65,34 @@ def init_map(dic):
         j = 0
         for cell in line:
             j += 1
-            match cell:
-                case "H":
+            if cell=="H":
                     tmp["hero"] = (i, j)
-                case "D":
+            if cell=="D":
                     tmp["demoness"].append((i, j))
                     tmp["wall"].append((i, j))
-                case "#":
+            if cell=="#":
                     tmp["wall"].append((i, j))
-                case "B":
+            if cell=="B":
                     tmp["block"].append((i, j))
-                case "K":
+            if cell=="K":
                     tmp["key"].append((i, j))
-                case "L":
+            if cell=="L":
                     tmp["lock"].append((i, j))
-                case "M":
+            if cell=="M":
                     tmp["mob"].append((i, j))
-                case "S":
+            if cell=="S":
                     tmp["spikes"].append((i, j))
-                case "T":
+            if cell=="T":
                     tmp["trapSafe"].append((i, j))
-                case "U":
+            if cell=="U":
                     tmp["trapUnSafe"].append((i, j))
-                case "O":
+            if cell=="O":
                     tmp["block"].append((i, j))
                     tmp["spikes"].append((i, j))
-                case "P":
+            if cell=="P":
                     tmp["block"].append((i, j))
                     tmp["trapSafe"].append((i, j))
-                case "Q":
+            if cell=="Q":
                     tmp["block"].append((i, j))
                     tmp["trapUnSafe"].append((i, j))
     # init de s0
