@@ -1,13 +1,12 @@
 """
 [IA02] Projet SAT/Helltaker python
 author:  Hugo Milair
-version: 1.0
 """
 from typing import List, Tuple
 import itertools
 import subprocess
 import sys
-from helltaker_utils import grid_from_file, check_plan
+from helltaker_utils import grid_from_file
 
 Variable = int
 Literal = int
@@ -16,19 +15,6 @@ Model = List[Literal]
 Clause_Base = List[Clause]
 Grid = List[List[int]]
 
-
-# Mettre des vraies grilles
-empty_grid: Grid = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
 
 fluents = {
     "perso": (2, 2),
@@ -39,7 +25,6 @@ fluents = {
     "block": [(1, 2), (2, 1)],
     "cle": (7, 4),
 }  # fluents
-# constantes
 map_constantes = {
     "sortie": [(7, 4), (2, 1)],
     "murs": [(4, 0), (5, 7), (8, 0)],

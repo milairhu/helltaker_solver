@@ -1,75 +1,55 @@
-# IA02 Projet Helltaker : https://hackmd.io/@ia02/BJ6eDYUI5
+# Solveur Helltaker
 
-## Description
-L’objectif de ce projet est de créer différentes « IA » capables de jouer à la partie puzzle du jeu Helltaker. Ce jeu, de la famille de Sokoban, est gratuit et disponible sous MacOS, Linux et Windows. L’objectif est d’implémenter différentes méthodes, de les décrire et de les comparer expérimentalement dans un petit rapport final.
+Projet final du cours **IA02 - Logique et Résolution de problèmes** par la recherche dispensé par M. Sylvain Lagrue à l'Université de Technologie de Compiègne (UTC).
+
+Par Mohamed Adnane Errazine, Hugo Milair et Calliste Vergnol, en Printemps 2022.
+
+Le répo orignal est disponible sur [GitLab](https://gitlab.utc.fr/milairhu/ia02-projet-helltaker). Ce répo ne contient que mon travail personnel. Il manque notamment un solveur utilisant A* réalisé en Python
+
+## Description de Helltaker
+
+L’objectif de ce projet est de créer différentes « IA » capables de jouer à la partie puzzle du jeu [Helltaker](https://store.steampowered.com/app/1289310/Helltaker). Ce jeu, de la famille de Sokoban, est gratuit et disponible sous MacOS, Linux et Windows. L’objectif est d’implémenter différentes méthodes, de les décrire et de les comparer expérimentalement dans un petit rapport final.
 
 ## Travail demandé
 
 ### Écriture du problème en STRIPS et en Prolog
 
-Vous devrez donner une représentation en STRIPS (ou l’un de ses dérivés) du problème. Mettre en exergue les principales différences avec Sokoban.
+"Vous devrez donner une représentation en STRIPS (ou l’un de ses dérivés) du problème. Mettre en exergue les principales différences avec Sokoban.
 
-Bonus : reprendre le code Prolog de Sokoban vu en cours et l’adapter pour Helltaker.
+Bonus : reprendre le code Prolog de Sokoban vu en cours et l’adapter pour Helltaker."
 
 ### Implémentation
 
-Vous devrez implémenter 2 méthodes différentes parmi les 3 suivantes.
+"Vous devrez implémenter 2 méthodes différentes parmi les 3 suivantes.
 
 1) Recherche dans un espace d’état (Python)
 2) SATPLAN (réécriture en SAT du problème de planification)
-3) ASPPLAN (réécriture en ASP du problème de planification)
+3) ASPPLAN (réécriture en ASP du problème de planification) "
 
-### Rapport
+Nous avons réalisé une implémentation de la première et troisième méthodes. La première n'est pas présente dans ce répo. Néanmoins, une version non fonctionnelle de la deuxième méthode est disponible dans le dossier [SAT](SAT). La version **ASP** est disponibledans le dossier [ASP](ASP). Une autre version utilisant le langage **Prolog** est disponible dans le dossier [Prolog](Prolog).
 
-Le rapport, de 10 pages maximum, suivra le plan suivant. Vous pouvez néanmoins l’enrichir à votre guise.
 
-Introduction
-Préliminaires
-    Présentation des règles du jeu
-    Le problème en STRIPS
-Méthode 1
-    Représentation du problème
-    Choix d’implémentation et structures de données
-    Expérimentations pratiques
-Méthode 2
-    Représentation du problème
-    Choix d’implémentation et structures de données
-    Expérimentations pratiques
-Comparaison expérimentale des 2 méthodes
+La sortie attende du programme sur la sortie standard est de type: *hhbgdbbgh*
+Ceci correspond à une simplification des actions à réaliser pour réussir le labyrinthe (h = haut, b = bas, d = droite, g = gauche).
 
-### Rendu attendu
+## Utilisation
 
-- 1 programme Prolog de modélisation
-- 2 programmes implémentant les méthodes choisies et respectant les formats d’entrée/sortie imposés
-- 1 rapport
-*Date limite de rendu (code + rapport) : mercredi 15 juin (23h59)*
+### ASP et SAT
 
-Vos programmes seront testés de façon automatique sur une machine dédiée. Les fichiers seront automatiquement donnés à votre programme et le plan généré sera testé. L’outil de lecture de fichiers et la fonction main de votre programme vous seront donnés en python.
+Après avoir installé les dépendances nécessaires, l'utilisateur peut lancer le solveur ASP ou SAT (ce dernier n'est pas fonctionnel) en utilisant la commande suivante:
 
-Réponse attendue du programme sur la sortie standard (fin de ligne \n) : hhbgdbbgh
-Ceci correspond à une simplification des actions (h = haut, b = bas, d = droite, g = gauche)
+ ```python
+python3 ./ASP/ASP_helltaker.py <grille>
+```
 
-### Évaluation
+Où la grille peut être une grille du répo ou par une grille personnalisée. Elle doit néanmoins satisfaire les conditions suivantes:
 
-Les points suivants seront pris en compte pour l’évaluation :
-
-- Solutions choisies et élégance de celles-ci
-- Qualité du code et utilisation des outils dédiés (black, mypy, pylint, etc.)
-- Efficacité du code (les programmes seront lancés automatiquement sur une machine dédiée)
-
-## Ressources 
-### Nos liens utiles
-
-Path finding avec A* : https://qiao.github.io/PathFinding.js/visual/?fbclid=IwAR3vkBO_nDFXb86Goq_GLt2m1WqAEZwjeUCo3qioAqWGhqhaQ7ASPBZjlHk
-où best first seach = glouton et breadth-first-seach = recherche par largeur
-
-### Quelques liens
-
-Helltaker sur wikipedia : https://fr.wikipedia.org/wiki/Helltaker
-Helltaker sur steam: https://store.steampowered.com/app/1289310/Helltaker/
-Télécharger Helltaker sur le site du développeur sans avoir à installer steam : https://vanripper.itch.io/helltaker
-Helltaker sur fandom : https://helltaker.fandom.com/wiki/Helltaker_Wiki
-Description SATPLAN : https://en.wikipedia.org/wiki/Satplan
-Description ASPPLAN : tba
-
-### Code fourni tba
+- la *map* est entourée de **murs** représentés par des `#`
+- le *point de départ* est représenté par un `H`
+- un *bloc* pouvant être déplacé est représenté par un `B`. Le personnage peut les pousser.
+- un *mob* est représenté par un `M`
+- la *sortie* ou la *démone* est représentée par un `D`
+- une *clé* est représentée par un `K`
+- une *porte* est représentée par un `L`. Elle doit être ouverte par une clé
+- un *trap* est représenté par un `T` ou un `U` si. Un trap enlève un coup possible au joueur. Il n'apparait qu'un tour sur deux.
+- des pics sont représentés par des `P`. Ils enlèvent un coup possible au joueur.

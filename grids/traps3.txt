@@ -1,0 +1,9 @@
+Level trap 3 // level 5
+7
+#H#
+# #
+# #
+#M#
+#T# 
+# #
+#D#
