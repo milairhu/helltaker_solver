@@ -1,6 +1,0 @@
-Spikes et Block (proposée par H. Milair)
-8
-     ###
-######D####
-#H   O    #
-###########
