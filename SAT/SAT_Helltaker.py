@@ -6,7 +6,10 @@ from typing import List, Tuple
 import itertools
 import subprocess
 import sys
-from helltaker_utils import grid_from_file
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from utils.helltaker_utils import grid_from_file  # Remplacez ceci par les fonctions que vous voulez utiliser
 
 Variable = int
 Literal = int

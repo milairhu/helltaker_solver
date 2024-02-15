@@ -1,5 +1,8 @@
 import sys
-from helltaker_utils import grid_from_file
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from utils.helltaker_utils import grid_from_file
 from clingo.symbol import Number
 from clingo.control import Control
 
