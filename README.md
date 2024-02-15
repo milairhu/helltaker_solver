@@ -60,3 +60,7 @@ python3 ./ASP/ASP_helltaker.py <grille>
 ```
 
 Où la grille peut être une grille du répo ou par une grille personnalisée.
+
+### Prolog
+
+Dans le dossier [Prolog](Prolog), l'utilisateur peut trouver le solveur d'un niveau Helltaker en Prolog. Pour le tester, il peut copier le code et le coller dans un interpréteur Prolog, par exemple celui de [SWICH.SWI-Prolog](https://swish.swi-prolog.org/).

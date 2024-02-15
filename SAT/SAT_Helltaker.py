@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from utils.helltaker_utils import grid_from_file  # Remplacez ceci par les fonctions que vous voulez utiliser
+from utils.helltaker_utils import grid_from_file 
 
 Variable = int
 Literal = int
